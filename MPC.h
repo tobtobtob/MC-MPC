@@ -1,0 +1,21 @@
+/*
+ * MPC.h
+ *
+ *  Created on: Nov 29, 2015
+ *      Author: topi
+ */
+
+#ifndef MPC_H_
+#define MPC_H_
+
+#include <lemon/list_graph.h>
+
+using namespace lemon;
+
+ListDigraph::ArcMap<int> find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands);
+
+void find_minflow(ListDigraph& g);
+
+
+
+#endif /* MPC_H_ */
