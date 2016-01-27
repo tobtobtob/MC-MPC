@@ -10,10 +10,11 @@
 
 #include <lemon/list_graph.h>
 
+
 using namespace lemon;
 
 
-void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob);
+void createRandomGraph(ListDigraph& g, ListDigraph::NodeMap<int>& labels, int num_nodes, float edge_prob);
 
 void addSourceAndSink(ListDigraph& g);
 

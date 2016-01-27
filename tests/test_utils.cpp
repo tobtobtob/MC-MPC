@@ -9,14 +9,15 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 using namespace std;
 using namespace lemon;
 
 //Simple function for generating acyclic graphs
-void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob){
+void createRandomGraph(ListDigraph& g, ListDigraph::NodeMap<int>& labels, int num_nodes, float edge_prob){
 
 	srand(time(NULL));
-	ListDigraph::ArcMap<int> labels(g);
+	//ListDigraph::NodeMap<int> labels(g);
 
 	for(int i=0; i<num_nodes; i++){
 		ListDigraph::Node new_node = g.addNode();
@@ -52,8 +53,9 @@ void addSourceAndSink(ListDigraph& g){
         }
     }
 
-
 }
+
+
 
 
 

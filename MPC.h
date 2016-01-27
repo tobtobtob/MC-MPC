@@ -12,7 +12,7 @@
 
 using namespace lemon;
 
-ListDigraph::ArcMap<int> find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int> flow);
+ListDigraph::ArcMap<int> find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow);
 
 void find_minflow(ListDigraph& g);
 
