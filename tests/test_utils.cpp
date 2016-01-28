@@ -14,10 +14,10 @@ using namespace std;
 using namespace lemon;
 
 //Simple function for generating acyclic graphs
-void createRandomGraph(ListDigraph& g, ListDigraph::NodeMap<int>& labels, int num_nodes, float edge_prob){
+void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob){
 
 	srand(time(NULL));
-	//ListDigraph::NodeMap<int> labels(g);
+	ListDigraph::NodeMap<int> labels(g);
 
 	for(int i=0; i<num_nodes; i++){
 		ListDigraph::Node new_node = g.addNode();
@@ -43,12 +43,14 @@ void addSourceAndSink(ListDigraph& g){
 
     ListDigraph::Node s = g.addNode();
     ListDigraph::Node t = g.addNode();
-
-    for(ListDigraph::NodeIt n; n != INVALID; ++n){
-        if(countInArcs(g, n) == 0){
+  
+    //connect nodes with no incoming or outcoming arcs to source and sink, respectively
+    for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    
+        if(countInArcs(g, n) == 0 && n != s && n != t){
             g.addArc(s, n);
         }
-        if(countOutArcs(g, n) == 0){
+        if(countOutArcs(g, n) == 0 && n != s && n != t){
             g.addArc(n, t);
         }
     }

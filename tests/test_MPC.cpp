@@ -11,17 +11,23 @@ using namespace lemon;
 
 
 TEST_CASE("Feasible flow is found"){
-    ListDigraph g;
-    ListDigraph::NodeMap<int> labels(g);
-    createRandomGraph(g, labels, 100, 0.9);
-    addSourceAndSink(g);
     srand(time(NULL));
+    ListDigraph g;
+    createRandomGraph(g, 100, 0.9);
+    
+    addSourceAndSink(g);
     
     ListDigraph::ArcMap<int> demands(g);
+    ListDigraph::ArcMap<int> flow(g);
+    
+    
+    
     for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
         demands[ai] = rand()%2;
+        flow[ai] = 0;
+        g.target(ai);
     }
-    ListDigraph::ArcMap<int> flow(g);
+    
     find_feasible_flow(g, demands, flow);
 
     //check that the flow satisfies the demands:
