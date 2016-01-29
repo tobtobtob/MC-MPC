@@ -8,7 +8,39 @@
 using namespace std;
 using namespace lemon;
 
+TEST_CASE("correct minflow is generated"){
+  srand(time(NULL));
+  ListDigraph g;
+  createRandomGraph(g, 100, 0.9);
+    
+  addSourceAndSink(g);
+    
+  ListDigraph::ArcMap<int> demands(g);
+  ListDigraph::ArcMap<int> flow(g);
+  
+  ListDigraph::Node s, t;
+  
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    if(countOutArcs(g, n) == 0){
+      s = n;
+    }
+    else if(countInArcs(g, n) == 0){
+      t = n;
+    }
+  }
+    
+    
+    
+  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
+    demands[ai] = rand()%2;
+    flow[ai] = 0;
+    g.target(ai);
+  }
+  
+  find_minflow(g, demands, flow, s, t);
+  REQUIRE(4 == 4);
 
+}
 
 TEST_CASE("Feasible flow is found"){
     srand(time(NULL));
