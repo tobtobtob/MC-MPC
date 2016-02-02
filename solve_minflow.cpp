@@ -43,7 +43,7 @@ void solve_via_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& costs)
 	costScaling.lowerMap(demands);
 	costScaling.costMap(costs);
 
-	//pushing 100 uniths of flow is just arbitrary number, it has to be equal or bigger than the minimum flow
+	//pushing 100 units of flow is just arbitrary number, it has to be equal or bigger than the minimum flow
 	costScaling.stSupply(s, t, 100);
 
 	costScaling.run();

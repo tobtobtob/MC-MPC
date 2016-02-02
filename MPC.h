@@ -1,10 +1,3 @@
-/*
- * MPC.h
- *
- *  Created on: Nov 29, 2015
- *      Author: topi
- */
-
 #ifndef MPC_H_
 #define MPC_H_
 

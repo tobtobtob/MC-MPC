@@ -1,4 +1,5 @@
 #include <lemon/list_graph.h>
+#include <lemon/preflow.h>
 #include <typeinfo>
 
 #define INFINITE 99999
@@ -67,18 +68,29 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   
   ListDigraph::ArcMap<int> copy_capacities(copyG);
   
+  //link arcs of original graph g to the reverse arcs in copy, for later use.
+  ListDigraph::ArcMap<ListDigraph::Arc> reverse_arc(g);
+  
   //set arc capacities in the copy
   for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
-    //cout << "HEPPI\n"; 
     copy_capacities[arc_g_to_copy[a]] = INFINITE;
     ListDigraph::Arc backward = copyG.addArc(node_g_to_copy[g.target(a)], node_g_to_copy[g.source(a)]);
     copy_capacities[backward] = feasible_flow[a] - demands[a];
     
+    reverse_arc[a] = backward;
+    
   }
   
   //find max-flow in the copy
+  Preflow<ListDigraph, ListDigraph::ArcMap<int> > preflow(copyG, copy_capacities, copyT, copyS);
   
-  //
+  preflow.run(); 
+  
+  //then calculate the final flow
+  
+  for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
+    flow[a] = feasible_flow[a] + preflow.flow(arc_g_to_copy[a]) - preflow.flow(reverse_arc[a]);
+  }
   
 }
 
