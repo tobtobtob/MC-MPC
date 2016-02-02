@@ -68,10 +68,11 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   ListDigraph::ArcMap<int> copy_capacities(copyG);
   
   //set arc capacities in the copy
-  for(ListDigraph::ArcIt a(copyG); a != INVALID; ++a){
-    copy_capacities[a] = INFINITE;
-    ListDigraph::Arc backward = copyG.addArc(copyG.target(a), copyG.source(a));
-    copy_capacities[backward] = feasible_flow[arc_copy_to_g[a]] - demands[arc_copy_to_g[a]];
+  for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
+    //cout << "HEPPI\n"; 
+    copy_capacities[arc_g_to_copy[a]] = INFINITE;
+    ListDigraph::Arc backward = copyG.addArc(node_g_to_copy[g.target(a)], node_g_to_copy[g.source(a)]);
+    copy_capacities[backward] = feasible_flow[a] - demands[a];
     
   }
   
