@@ -16,7 +16,9 @@ using namespace lemon;
 
 void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob);
 
-void addSourceAndSink(ListDigraph& g);
+ListDigraph::Node addSource(ListDigraph& g);
+
+ListDigraph::Node addSink(ListDigraph& g);
 
 
 

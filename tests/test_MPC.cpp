@@ -1,5 +1,4 @@
 #include "test_utils.h"
-#include <lemon/connectivity.h>
 #include <lemon/list_graph.h>
 #include <lemon/cost_scaling.h>
 #include "../MPC.h"
@@ -148,25 +147,16 @@ TEST_CASE("feasible minflow is generated"){
   srand(time(NULL));
   ListDigraph g;
   createRandomGraph(g, 100, 0.9);
-    
-  addSourceAndSink(g);
-    
+ 
+  ListDigraph::Node s, t;
+  
+  s = addSource(g);
+  t = addSink(g);
+      
   ListDigraph::ArcMap<int> demands(g);
   ListDigraph::ArcMap<int> flow(g);
   
-  ListDigraph::Node s, t;
-  
-  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
-    if(countOutArcs(g, n) == 0){
-      s = n;
-    }
-    else if(countInArcs(g, n) == 0){
-      t = n;
-    }
-  }
-    
-    
-    
+
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
     demands[ai] = rand()%2;
     flow[ai] = 0;
@@ -182,31 +172,25 @@ TEST_CASE("feasible minflow is generated"){
 
 }
 
+
 TEST_CASE("Minflow value is correct"){
   srand(time(NULL));
   ListDigraph g;
-  createRandomGraph(g, 100, 0.9);
+  createRandomGraph(g, 10, 0.9);
     
-  addSourceAndSink(g);
+  ListDigraph::Node s, t;
   
-  //if(connected(g)) cout << "connected\n";
+  s = addSource(g);
+  t = addSink(g);
+ 
     
   ListDigraph::ArcMap<int> demand(g);
   ListDigraph::ArcMap<int> cost(g);
   ListDigraph::ArcMap<int> flow(g);
   
-  ListDigraph::Node s, t;
   
-  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
-    if(countOutArcs(g, n) == 0){
-      s = n;
-    }
-    else if(countInArcs(g, n) == 0){
-      t = n;
-    }
-  }
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    demand[ai] = rand()%2;
+    demand[ai] = 1;
     cost[ai] = 1;
   }
   
@@ -239,7 +223,10 @@ TEST_CASE("Feasible flow is found"){
     ListDigraph g;
     createRandomGraph(g, 100, 0.9);
     
-    addSourceAndSink(g);
+    ListDigraph::Node s, t;
+  
+    s = addSource(g);
+    t = addSink(g);
     
     ListDigraph::ArcMap<int> demands(g);
     ListDigraph::ArcMap<int> flow(g);

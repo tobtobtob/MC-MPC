@@ -2,7 +2,7 @@
 #include <lemon/preflow.h>
 #include <typeinfo>
 
-#define INFINITE 9999999
+#define INFINITE 999
 
 using namespace lemon;
 using namespace std;
@@ -85,13 +85,12 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   //find max-flow in the copy
   Preflow<ListDigraph, ListDigraph::ArcMap<int> > preflow(copyG, copy_capacities, copyT, copyS);
   
-  preflow.run(); 
-  cout << preflow.flowValue() << " \n";
+  preflow.run();
+  
   //then calculate the final flow
   
   for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
     flow[a] = feasible_flow[a] - preflow.flow(reverse_arc[a]) + preflow.flow(arc_g_to_copy[a]);
-    cout << feasible_flow[a] << " - " << preflow.flow(reverse_arc[a]) << " " << flow[a] << " \n";
   }
   
 }

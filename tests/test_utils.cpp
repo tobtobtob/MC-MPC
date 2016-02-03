@@ -38,27 +38,31 @@ void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob){
 	}
 }
 
-//adds a source node and a sink node to the given graph
-void addSourceAndSink(ListDigraph& g){
+ListDigraph::Node addSource(ListDigraph& g){
 
-    ListDigraph::Node s = g.addNode();
-    ListDigraph::Node t = g.addNode();
-  
-    //connect nodes with no incoming or outcoming arcs to source and sink, respectively
-    for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+  ListDigraph::Node s = g.addNode();
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
     
-        if(countInArcs(g, n) == 0 && n != s && n != t){
+        if(countInArcs(g, n) == 0 && n != s){
             g.addArc(s, n);
         }
-        if(countOutArcs(g, n) == 0 && n != s && n != t){
+    }
+    
+  return s;
+}
+
+ListDigraph::Node addSink(ListDigraph& g){
+
+  ListDigraph::Node t = g.addNode();  
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    
+        if(countOutArcs(g, n) == 0 && n != t){
             g.addArc(n, t);
         }
     }
-
+    
+  return t;
 }
-
-
-
 
 
 
