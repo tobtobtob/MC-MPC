@@ -1,4 +1,5 @@
 #include "test_utils.h"
+#include <lemon/connectivity.h>
 #include <lemon/list_graph.h>
 #include <lemon/cost_scaling.h>
 #include "../MPC.h"
@@ -39,6 +40,38 @@ void check_flow_conservation(ListDigraph& g, ListDigraph::ArcMap<int>& flow){
 
     REQUIRE(inflow == outflow);
   }
+}
+
+TEST_CASE("simple test case succeeds"){
+  ListDigraph g;
+  ListDigraph::Node s = g.addNode();
+  ListDigraph::Node t = g.addNode();
+  ListDigraph::Node a = g.addNode();
+  ListDigraph::Node b = g.addNode();
+  ListDigraph::Node c = g.addNode();
+  
+  ListDigraph::Arc sa = g.addArc(s, a);
+  ListDigraph::Arc sb = g.addArc(s, b);
+  ListDigraph::Arc ac = g.addArc(a, c);
+  ListDigraph::Arc bc = g.addArc(b, c);
+  ListDigraph::Arc ct = g.addArc(c, t);
+  
+  ListDigraph::ArcMap<int> demand(g);
+  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
+    demand[ai] = 1;
+  }
+  ListDigraph::ArcMap<int> flow(g);
+  
+  find_minflow(g, demand, flow, s, t);
+  
+  REQUIRE(flow[ct] == 2);
+  REQUIRE(flow[sa] == 1);
+  REQUIRE(flow[sb] == 1);
+  REQUIRE(flow[bc] == 1);
+  REQUIRE(flow[ac] == 1);
+  
+    
+  
 }
 
 TEST_CASE("feasible minflow is generated"){
@@ -110,7 +143,7 @@ TEST_CASE("Minflow value is correct"){
 	costScaling.costMap(cost);
 
 	//pushing 100 units of flow is just arbitrary number, it has to be equal or bigger than the minimum flow
-	costScaling.stSupply(s, t, 100);
+	costScaling.stSupply(s, t, 1000);
 
 	costScaling.run();
 	
