@@ -91,7 +91,7 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   
   for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
     flow[a] = feasible_flow[a] - preflow.flow(reverse_arc[a]) + preflow.flow(arc_g_to_copy[a]);
-    //cout << feasible_flow[a] << "  " << flow[a] << " \n";
+    cout << feasible_flow[a] << " - " << preflow.flow(reverse_arc[a]) << " " << flow[a] << " \n";
   }
   
 }
