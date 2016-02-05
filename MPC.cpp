@@ -1,6 +1,5 @@
 #include <lemon/list_graph.h>
 #include <lemon/preflow.h>
-#include <typeinfo>
 
 #define INFINITE 999
 
@@ -8,9 +7,8 @@ using namespace lemon;
 using namespace std;
 
 
-void find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow){
-  
-	
+void find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow)
+{ 
 	for (ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
 	  //iterate through every edge in the graph
 	  //if there is some unsatisfied demand, create a flow that satisfies that demand
@@ -41,8 +39,8 @@ void find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListD
 }
 
 //find minflow by reducing the maximal amount of flow (with maxflow) from a feasible flow
-void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t){
-
+void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t)
+{
   ListDigraph::ArcMap<int> feasible_flow(g);
   find_feasible_flow(g, demands, feasible_flow);
   
@@ -94,25 +92,3 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   }
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

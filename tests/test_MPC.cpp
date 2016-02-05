@@ -176,7 +176,7 @@ TEST_CASE("feasible minflow is generated"){
 TEST_CASE("Minflow value is correct"){
   srand(time(NULL));
   ListDigraph g;
-  createRandomGraph(g, 10, 0.9);
+  createRandomGraph(g, 100, 0.9);
     
   ListDigraph::Node s, t;
   
