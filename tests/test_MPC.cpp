@@ -143,7 +143,7 @@ TEST_CASE("A bit more complicated test case succeeds"){
   
 }
 
-TEST_CASE("feasible minflow is generated"){
+TEST_CASE("feasible minflow is generated for a random graph"){
   srand(time(NULL));
   ListDigraph g;
   createRandomGraph(g, 100, 0.9);
@@ -173,7 +173,7 @@ TEST_CASE("feasible minflow is generated"){
 }
 
 
-TEST_CASE("Minflow value is correct"){
+TEST_CASE("Minflow value is correct for a random graph"){
   srand(time(NULL));
   ListDigraph g;
   createRandomGraph(g, 100, 0.9);
@@ -218,7 +218,7 @@ TEST_CASE("Minflow value is correct"){
 }
 
 
-TEST_CASE("Feasible flow is found"){
+TEST_CASE("Feasible flow is found for a random graph"){
     srand(time(NULL));
     ListDigraph g;
     createRandomGraph(g, 100, 0.9);
