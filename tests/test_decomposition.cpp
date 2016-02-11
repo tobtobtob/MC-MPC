@@ -41,4 +41,18 @@ TEST_CASE("correct reachability table is created for a simple graph")
 
   	REQUIRE(reachable[labels[s]][labels[t]] == true);
   	REQUIRE(reachable[labels[t]][labels[s]] == false);
+
+    REQUIRE(reachable[labels[s]][labels[c]] == true);
+    REQUIRE(reachable[labels[a]][labels[c]] == true);
+    REQUIRE(reachable[labels[b]][labels[t]] == true);
+
+    REQUIRE(reachable[labels[c]][labels[s]] == false);
+    REQUIRE(reachable[labels[c]][labels[a]] == false);
+    REQUIRE(reachable[labels[t]][labels[s]] == false);
+}
+
+TEST_CASE("correct reachability table is created for a random graph")
+{
+  //to be done
+
 }
