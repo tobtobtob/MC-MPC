@@ -236,7 +236,6 @@ TEST_CASE("Feasible flow is found for a random graph"){
     for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
         demands[ai] = rand()%2;
         flow[ai] = 0;
-        g.target(ai);
     }
     
     find_feasible_flow(g, demands, flow);

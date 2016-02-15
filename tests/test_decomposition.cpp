@@ -53,11 +53,6 @@ TEST_CASE("correct reachability table is created for a simple graph")
     REQUIRE(reachable[labels[t]][labels[s]] == false);
 }
 
-TEST_CASE("correct reachability table is created for a random graph")
-{
-  //to be done
-
-}
 
 bool can_reach_some_other_node(int node_id, ListDigraph::Node* ants, int num_ants, ListDigraph& g, Bfs<ListDigraph>& bfs){
   for (int i = 0; i < num_ants; ++i)
@@ -123,4 +118,41 @@ TEST_CASE("MACs are found in an easy test case")
   for(vector<ListDigraph::Node*>::iterator it = decomposition.begin(); it != decomposition.end(); ++it){
     REQUIRE(isMac(*it, num_ants, g));
   }
+}
+
+TEST_CASE("MACs are found in a random graph")
+{
+  srand(time(NULL));
+  ListDigraph g;
+  ListDigraph::ArcMap<int> demands(g);
+  createMACGraph(g, 6, 50, demands);
+    
+  ListDigraph::Node s, t;
+  
+  s = addSource(g);
+  t = addSink(g);
+  ListDigraph::ArcMap<int> minflow(g);
+  ListDigraph::NodeMap<int> labels(g);
+
+  int counter = 0;
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    labels[n] = counter;
+    counter++;
+  }
+    
+  find_minflow(g, demands, minflow, s, t);
+  int num_ants = 0;
+  for (ListDigraph::OutArcIt o(g, s); o != INVALID; ++o)
+  {
+    num_ants += minflow[o];
+  }
+  vector<ListDigraph::Node*> decomposition;
+
+  decompose_graph(g, minflow, s, t, labels, decomposition);
+  REQUIRE(!decomposition.empty());
+
+  for(vector<ListDigraph::Node*>::iterator it = decomposition.begin(); it != decomposition.end(); ++it){
+    REQUIRE(isMac(*it, num_ants, g));
+  }
+
 }

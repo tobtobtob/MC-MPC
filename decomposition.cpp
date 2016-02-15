@@ -67,7 +67,6 @@ ListDigraph::Node get_ant_move(ListDigraph::Node node, ListDigraph::ArcMap<int>&
 //Decomposition of the graph is modelled by a vector of vectors of nodes. Each vector of nodes forms one antichain, along which the graph can be decomposed. 
 void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, ListDigraph::NodeMap<int>& labels, vector<ListDigraph::Node*>& decomposition)
 {
-	//vector<ListDigraph::Node*> decomposition;
 
 	int num_nodes = countNodes(g);
 	bool** reachable = (bool**) calloc(num_nodes, sizeof(bool*));

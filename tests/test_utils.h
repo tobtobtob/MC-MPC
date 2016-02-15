@@ -20,6 +20,8 @@ ListDigraph::Node addSource(ListDigraph& g);
 
 ListDigraph::Node addSink(ListDigraph& g);
 
+void createMACGraph(ListDigraph& g, int num_paths, int path_length, ListDigraph::ArcMap<int>& demands);
+
 
 
 #endif /* TESTS_TEST_UTILS_H_ */
