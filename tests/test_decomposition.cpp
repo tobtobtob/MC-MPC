@@ -54,24 +54,6 @@ TEST_CASE("correct reachability table is created for a simple graph")
 }
 
 
-bool can_reach_some_other_node(int node_id, ListDigraph::Node* ants, int num_ants, ListDigraph& g, Bfs<ListDigraph>& bfs){
-  for (int i = 0; i < num_ants; ++i)
-  {
-    if(node_id == i) continue;
-    if(bfs.run(ants[node_id], ants[i])) return true;
-  }
-  return false;
-}
-
-bool isMac(ListDigraph::Node* ants, int num_ants, ListDigraph& g){
-  Bfs<ListDigraph> bfs(g);
-  for (int i = 0; i < num_ants; ++i)
-  {
-    if(can_reach_some_other_node(i, ants, num_ants, g, bfs)) return false;
-  }
-  return true;
-}
-
 TEST_CASE("MACs are found in an easy test case")
 {
   ListDigraph g;

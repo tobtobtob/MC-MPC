@@ -4,9 +4,6 @@ using namespace lemon;
 using namespace std;
 
 
-#define MAX_NODES 99999
-
-
 
 void recur(ListDigraph& g, ListDigraph::Node current, ListDigraph::NodeMap<bool>& visited, bool** reachability, int num_nodes, ListDigraph::NodeMap<int>& labels)
 {

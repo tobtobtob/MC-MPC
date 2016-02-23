@@ -1,7 +1,7 @@
 #include <lemon/list_graph.h>
 #include <lemon/preflow.h>
 
-#define INFINITE 999
+#define INFINITE 999999
 
 using namespace lemon;
 using namespace std;
@@ -77,7 +77,6 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
     copy_capacities[backward] = feasible_flow[a] - demands[a];
     
     reverse_arc[a] = backward;
-    
   }
   
   //find max-flow in the copy

@@ -10,37 +10,6 @@ using namespace std;
 using namespace lemon;
 
 
-void flow_satisfies_demands(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demand){
-  int f, d;
-  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    f = flow[ai];
-    d = demand[ai];
-    REQUIRE(f >= d);
-  }
-}
-
-void check_flow_conservation(ListDigraph& g, ListDigraph::ArcMap<int>& flow){
-  //check for flow conservation; each node (Except s and t) receives and sends the same amount of flow
-  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
-    int inflow = 0;
-    int outflow = 0;
-
-    //skip s and t
-    if(countInArcs(g, n) == 0 || countOutArcs(g, n) == 0){
-    	continue;
-    }
-
-    for(ListDigraph::InArcIt ia(g, n); ia != INVALID; ++ia){
-    	inflow += flow[ia];
-    }
-    for(ListDigraph::OutArcIt oa(g, n); oa != INVALID; ++oa){
-    	outflow += flow[oa];
-    }
-
-    REQUIRE(inflow == outflow);
-  }
-}
-
 TEST_CASE("simple test case succeeds"){
   ListDigraph g;
   ListDigraph::Node s = g.addNode();
@@ -191,29 +160,31 @@ TEST_CASE("Minflow value is correct for a random graph"){
   
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
     demand[ai] = 1;
-    cost[ai] = 1;
+    cost[ai] = 0;
   }
   
   CostScaling<ListDigraph> costScaling(g);
 	costScaling.lowerMap(demand);
 	costScaling.costMap(cost);
 
-	//pushing 100 units of flow is just arbitrary number, it has to be equal or bigger than the minimum flow
-	costScaling.stSupply(s, t, 1000);
-
-	costScaling.run();
+  int minflow_value = 0;
+  int problem_type = 0;
+  while(problem_type != 1){
+    minflow_value++;
+    costScaling.stSupply(s, t, minflow_value);
+    problem_type = costScaling.run();
+    
+  }
 	
 	find_minflow(g, demand, flow, s, t);
 	
-	int minflow_counter = 0;
 	int maxflow_counter = 0;
 	
-	for(ListDigraph::InArcIt ia(g, s); ia != INVALID; ++ia){
-	  
-	  minflow_counter += costScaling.flow(ia);
+	for(ListDigraph::OutArcIt ia(g, s); ia != INVALID; ++ia){
+
 	  maxflow_counter += flow[ia];
 	}
-	REQUIRE(minflow_counter == maxflow_counter);
+	REQUIRE(minflow_value == maxflow_counter);
   
 }
 

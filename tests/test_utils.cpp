@@ -8,6 +8,8 @@
 #include <lemon/list_graph.h>
 #include <stdlib.h>
 #include <time.h>
+#include <lemon/bfs.h>
+#include "catch.hpp"
 
 
 using namespace std;
@@ -109,5 +111,54 @@ ListDigraph::Node addSink(ListDigraph& g){
   return t;
 }
 
+
+bool can_reach_some_other_node(int node_id, ListDigraph::Node* ants, int num_ants, ListDigraph& g, Bfs<ListDigraph>& bfs){
+  for (int i = 0; i < num_ants; ++i)
+  {
+    if(node_id == i) continue;
+    if(bfs.run(ants[node_id], ants[i])) return true;
+  }
+  return false;
+}
+
+bool isMac(ListDigraph::Node* ants, int num_ants, ListDigraph& g){
+  Bfs<ListDigraph> bfs(g);
+  for (int i = 0; i < num_ants; ++i)
+  {
+    if(can_reach_some_other_node(i, ants, num_ants, g, bfs)) return false;
+  }
+  return true;
+}
+
+void flow_satisfies_demands(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demand){
+  int f, d;
+  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
+    f = flow[ai];
+    d = demand[ai];
+    REQUIRE(f >= d);
+  }
+}
+
+void check_flow_conservation(ListDigraph& g, ListDigraph::ArcMap<int>& flow){
+  //check for flow conservation; each node (Except s and t) receives and sends the same amount of flow
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    int inflow = 0;
+    int outflow = 0;
+
+    //skip s and t
+    if(countInArcs(g, n) == 0 || countOutArcs(g, n) == 0){
+    	continue;
+    }
+
+    for(ListDigraph::InArcIt ia(g, n); ia != INVALID; ++ia){
+    	inflow += flow[ia];
+    }
+    for(ListDigraph::OutArcIt oa(g, n); oa != INVALID; ++oa){
+    	outflow += flow[oa];
+    }
+
+    REQUIRE(inflow == outflow);
+  }
+}
 
 
