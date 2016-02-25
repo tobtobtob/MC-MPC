@@ -32,8 +32,8 @@ TEST_CASE("correct minflow in an overlap graph"){
 
   	find_minflow(g, demands, minflow, s, t);
 
-  	//check_flow_conservation(g, minflow);
-  	//flow_satisfies_demands(g, minflow, demands);
+  	check_flow_conservation(g, minflow);
+  	flow_satisfies_demands(g, minflow, demands);
 
   	CostScaling<ListDigraph> costScaling(g);
   	ListDigraph::ArcMap<int> dummyCosts(g);
@@ -60,7 +60,7 @@ TEST_CASE("correct minflow in an overlap graph"){
 
 
 
-/**TEST_CASE("decompose overlap graph"){
+TEST_CASE("decompose an overlap graph"){
 	ListDigraph g;
 	ListDigraph::NodeMap<int> labels(g);
 	ListDigraph::ArcMap<int> weights(g);
@@ -88,6 +88,8 @@ TEST_CASE("correct minflow in an overlap graph"){
   	vector<ListDigraph::Node*> decomposition;
 
   	decompose_graph(g, minflow, s, t, labels, decomposition);
+
+  	cout << decomposition.size() << " MACs found from the test graph\n";
   	REQUIRE(!decomposition.empty());
 
   	for(vector<ListDigraph::Node*>::iterator it = decomposition.begin(); it != decomposition.end(); ++it){
@@ -95,4 +97,4 @@ TEST_CASE("correct minflow in an overlap graph"){
   	}
 
   	cout << decomposition.size() << " MACs found from the test graph\n";
-}**/
+}
