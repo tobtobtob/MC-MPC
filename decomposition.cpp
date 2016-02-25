@@ -1,140 +1,39 @@
 #include <lemon/list_graph.h>
 #include <time.h>
 #include <stack>
+#include <climits>
 
 using namespace lemon;
 using namespace std;
 
-#define MAX_NODES 999999
 
-
-void recur(ListDigraph& g, ListDigraph::Node current, ListDigraph::NodeMap<bool>& visited, bool** reachability, int num_nodes, ListDigraph::NodeMap<int>& labels)
+bool can_reach_another_node(int path_index, ListDigraph::NodeMap<int*>& reachable, vector<ListDigraph::Node>* paths, int* path_indices, int num_paths)
 {
-	reachability[labels[current]][labels[current]] = true;
-
-	for(ListDigraph::OutArcIt o(g, current); o != INVALID; ++o){
-
-		ListDigraph::Node next = g.target(o);
-		reachability[labels[current]][labels[next]] = true;
-
-		if(!visited[next]) recur(g, next, visited, reachability, num_nodes, labels);
-
-		for(int i=0; i<num_nodes; i++){
-			reachability[labels[current]][i] = reachability[labels[current]][i] || reachability[labels[next]][i];
-		}
-	}
-	visited[current] = true;
-}
-
-void create_reachability_table(ListDigraph& g, bool** reachability, int num_nodes, ListDigraph::Node source, ListDigraph::NodeMap<int>& labels)
-{
-	ListDigraph::NodeMap<bool> visited(g);
-	recur(g, source, visited, reachability, num_nodes, labels);
-}
-
-
-bool can_reach_another_node(int ant_index, bool** reachable, ListDigraph::NodeMap<int>& labels, ListDigraph::Node* ants, int num_ants)
-{
-	for(int i = 0; i< num_ants; i++){
-		if(i == ant_index) continue;
-		if(reachable[labels[ants[ant_index]]][labels[ants[i]]]) return true;
+	for(int i = 0; i< num_paths; i++){
+		if(i == path_index) continue;
+		if(reachable[paths[path_index][path_indices[path_index]]][i] <= path_indices[i]) return true;
 	}
 	return false;
 }
 
-bool is_MAC(bool** reachable, ListDigraph::NodeMap<int>& labels, ListDigraph::Node* ants, int num_ants)
+bool is_MAC(ListDigraph::NodeMap<int*>& reachable, vector<ListDigraph::Node>* paths, int* path_indices, int num_paths)
 {
-	for(int i = 0; i< num_ants; i++){
-		if(can_reach_another_node(i, reachable, labels, ants, num_ants)) return false;
+	for(int i = 0; i< num_paths; i++){
+		if(can_reach_another_node(i, reachable, paths, path_indices, num_paths)) return false;
 	}
 	return true;
 }
 
-//returns a node that is one step forwards from the given node
-ListDigraph::Node get_ant_move(ListDigraph::Node node, ListDigraph::ArcMap<int>& minFlow, ListDigraph& g)
-{
-	for(ListDigraph::OutArcIt o(g, node); o != INVALID; ++o){
-		if(minFlow[o] > 0){
-			//mark the path used -- reduce the flow by one
-			minFlow[o] -= 1;
-			return g.target(o);
-		}
-	}
-	//if no next node is found, we return the given node. In this case the given node should be the sink
-	return node;
-}
-
-//Decomposition of the graph is modelled by a vector of vectors of nodes. Each vector of nodes forms one antichain, along which the graph can be decomposed. 
-void decompose_graph_old(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, ListDigraph::NodeMap<int>& labels, vector<ListDigraph::Node*>& decomposition)
-{
-
-	clock_t start_time = clock();
-	cout << "start decomp\n";
-	int num_nodes = countNodes(g);
-	bool** reachable = (bool**) calloc(num_nodes, sizeof(bool*));
-
-	for(int i=0; i<num_nodes; i++) reachable[i] = (bool*) calloc(num_nodes, sizeof(bool));
-	cout << clock()-start_time << "\n";
-
-	create_reachability_table(g, (bool**) reachable, countNodes(g), s, labels);
-
-	cout << clock()-start_time << "\n";
-	int num_ants = 0;
-	for(ListDigraph::OutArcIt o(g, s); o != INVALID; ++o){
-		num_ants += minFlow[o];
-	}
-
-	//init the array of "ants" and set all ants to source
-	ListDigraph::Node ants[num_ants];
-	for(int i = 0; i< num_ants; i++){
-		ants[i] = s;
-	}
-
-	bool exit_loop = false;
-	while(!exit_loop){
-		//if one of the ants points to the sink, no more MACs can be found
-
-		if(is_MAC(reachable, labels, ants, num_ants)){
-			//copy the current ant setup to the decomposition vector
-			ListDigraph::Node* new_MAC = (ListDigraph::Node*) calloc(num_ants, sizeof(ListDigraph::Node));
-			copy(ants, ants+num_ants, new_MAC);
-			decomposition.push_back(new_MAC);
-
-			//then move each ant by one
-			for (int i = 0; i < num_ants; ++i){
-				ants[i] = get_ant_move(ants[i], minFlow, g);
-			}
-		}
-		else{
-			for (int i = 0; i < num_ants; ++i){
-				//we move each ant until it can't reach any other ant. after this we might have a MAC
-				while(can_reach_another_node(i, reachable, labels, ants, num_ants)){;
-					ants[i] = get_ant_move(ants[i], minFlow, g);
-
-					//without this it would eventually get stuck
-					if(ants[i] == t){
-						break;
-					}
-				}
-			}
-		}
-		for (int i = 0; i < num_ants; ++i){
-			if(ants[i] == t) exit_loop = true;
-		}
-
-	}
-	cout << clock()-start_time << "\n";
-	cout << "end decomp\n";
-}
-
-void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, ListDigraph::NodeMap<int>& labels, vector<ListDigraph::Node*>& decomposition){
+void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, vector<ListDigraph::Node*>& decomposition){
 
 	int num_paths = 0;
 	for(ListDigraph::OutArcIt o(g, s); o != INVALID; ++o){
 		num_paths += minFlow[o];
 	}
 
-	vector<ListDigraph::Node>* paths = (vector<ListDigraph::Node>*) calloc(num_paths, sizeof(vector<ListDigraph::Node>));
+	//Extract paths from the graph according to the minflow and create reachability tables
+
+	vector<ListDigraph::Node> paths[num_paths];
 	ListDigraph::NodeMap<int*> reachable(g);
 
 	for (int i = 0; i < num_paths; ++i)
@@ -144,6 +43,10 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 		while(node != t){
 			if(reachable[node] == NULL){
 				reachable[node] = (int*) calloc(num_paths, sizeof(int));
+				for (int i = 0; i < num_paths; ++i)
+				{
+					reachable[node][i] = INT_MAX;
+				}
 			}
 			reachable[node][i] = path_index;
 
@@ -203,12 +106,31 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 
 	while(!exit_loop){
 
-		if(is_MAC(path_indices)){
+		if(is_MAC(reachable, paths, path_indices, num_paths)){
+			ListDigraph::Node* new_MAC = (ListDigraph::Node*) calloc(num_paths, sizeof(ListDigraph::Node));
+			for (int i = 0; i < num_paths; ++i)
+			{
+				 new_MAC[i] = paths[i][path_indices[i]];
+			}
+			decomposition.push_back(new_MAC);
 
+			int lowest_index = INT_MAX;
+			for (int i = 0; i < num_paths; ++i)
+			{
+				if(path_indices[i] < lowest_index){
+					lowest_index = i;
+				}
+			}
+			path_indices[lowest_index]++;
 		}
 
 		else{
-
+			for (int i = 0; i < num_paths; ++i)
+			{
+				while(can_reach_another_node(i, reachable, paths, path_indices, num_paths) && paths[i][path_indices[i]] != t){
+					path_indices[i]++;
+				}
+			}
 		}
 
 		for (int i = 0; i < num_paths; ++i)
@@ -218,7 +140,6 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			}
 		}
 	}
-
 
 
 }

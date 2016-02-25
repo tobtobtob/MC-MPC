@@ -10,10 +10,25 @@
 #include <time.h>
 #include <lemon/bfs.h>
 #include "catch.hpp"
+ #include <iostream>
+#include <fstream>
+
 
 
 using namespace std;
 using namespace lemon;
+
+void drawGraphToFile(ListDigraph& g){
+	ofstream myfile;
+	myfile.open("graph.dot");
+	myfile << "digraph g {\n";
+	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
+	{
+		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << "\n";
+	}
+	myfile << "}\n";
+	myfile.close();
+}
 
 //Simple function for generating acyclic graphs
 void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob){
@@ -38,6 +53,48 @@ void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob){
 			}
 		}
 	}
+}
+
+void createKPathGraph(ListDigraph& g, int k, int n, int m, ListDigraph::ArcMap<int>& weights, ListDigraph::ArcMap<int>& demands){
+	srand(time(NULL));
+
+	ListDigraph::Node* nodes[k];
+	for (int i = 0; i < k; ++i)
+	{
+		nodes[i] = (ListDigraph::Node*) calloc(n, sizeof(ListDigraph::Node));
+	}
+	for (int i = 0; i < k; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			nodes[i][j] = g.addNode();
+			if(j != 0) g.addArc(nodes[i][j-1], nodes[i][j]);
+		}
+	}
+	for (int i = 0; i < m; ++i)
+	{
+		int k1 = rand()%k;
+		int k2 = rand()%k;
+		int n1 = rand()%(n-1);
+		int n2 = (rand()%(n-n1-1))+n1+1;
+
+		if(findArc(g, nodes[k1][n1], nodes[k2][n2]) == INVALID){
+			g.addArc(nodes[k1][n1], nodes[k2][n2]);
+		}
+	}
+	for (ListDigraph::ArcIt a(g); a != INVALID; ++a)
+	{
+		weights[a] = rand()%1000;
+	}
+	
+	//this splits every node and sets demand for the edge between the halves to 1
+	for (ListDigraph::NodeIt n(g); n != INVALID; ++n){
+		ListDigraph::Node new_node = g.split(n, false);
+		ListDigraph::Arc new_edge = g.addArc(n, new_node);
+		demands[new_edge] = 1;
+	}
+	
+
 }
 
 
