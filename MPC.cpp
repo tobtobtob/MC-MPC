@@ -1,5 +1,7 @@
 #include <lemon/list_graph.h>
 #include <lemon/preflow.h>
+#include <lemon/adaptors.h>
+#include <lemon/cost_scaling.h>
 
 #define INFINITE 999999
 
@@ -46,7 +48,6 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   ListDigraph::ArcMap<int> feasible_flow(g);
   find_feasible_flow(g, demands, feasible_flow);
   
-  
   ListDigraph copyG;
   
   
@@ -80,20 +81,19 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
     
     reverse_arc[a] = backward;
   }
-
-  cout << "after copy: " << (clock() - begin_time) << "\n";
   
   //find max-flow in the copy
+
+  
   Preflow<ListDigraph, ListDigraph::ArcMap<int> > preflow(copyG, copy_capacities, copyT, copyS);
   
   preflow.run();
+
   
   //then calculate the final flow
   
   for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
     flow[a] = feasible_flow[a] - preflow.flow(reverse_arc[a]) + preflow.flow(arc_g_to_copy[a]);
   }
-
-  cout << "after flow: " << (clock() - begin_time) << "\n";
   
 }

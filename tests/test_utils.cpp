@@ -24,7 +24,19 @@ void drawGraphToFile(ListDigraph& g){
 	myfile << "digraph g {\n";
 	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
 	{
-		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << "\n";
+		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) <<  "\n";
+	}
+	myfile << "}\n";
+	myfile.close();
+}
+
+void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map){
+	ofstream myfile;
+	myfile.open("graph.dot");
+	myfile << "digraph g {\n";
+	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
+	{
+		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
 	}
 	myfile << "}\n";
 	myfile.close();

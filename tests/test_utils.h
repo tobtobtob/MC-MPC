@@ -29,4 +29,6 @@ void check_flow_conservation(ListDigraph& g, ListDigraph::ArcMap<int>& flow);
 
 void drawGraphToFile(ListDigraph& g);
 
+void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map);
+
 #endif /* TESTS_TEST_UTILS_H_ */
