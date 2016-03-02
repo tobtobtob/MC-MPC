@@ -87,7 +87,7 @@ TEST_CASE("decompose an overlap graph"){
   	cout << num_ants << " <-- minflow value\n";
   	vector<ListDigraph::Node*> decomposition;
 
-  	decompose_graph(g, minflow, s, t, labels, decomposition);
+  	decompose_graph(g, minflow, s, t, decomposition);
 
   	//cout << decomposition.size() << " MACs found from the test graph\n";
   	REQUIRE(!decomposition.empty());
