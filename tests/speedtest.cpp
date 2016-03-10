@@ -77,6 +77,18 @@ ListDigraph::Node addSink(ListDigraph& g){
   return t;
 }
 
+void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map){
+  ofstream myfile;
+  myfile.open("graph.dot");
+  myfile << "digraph g {\n";
+  for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
+  {
+    myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
+  }
+  myfile << "}\n";
+  myfile.close();
+}
+
 
 void speedtest1(int k, int n, int m)
 {
@@ -309,7 +321,7 @@ void speedtest3(int k, int n, int m)
   }
 
   ListDigraph::ArcMap<int> flow(g);
-  find_minflow_ibfs_alt(g, demands, flow, s, t, k+1);
+  find_minflow_ibfs_alt(g, demands, flow, labels, s, t, k+1);
 
 
 
@@ -321,11 +333,130 @@ void speedtest3(int k, int n, int m)
 
   clock_t after_decomposition = clock();
   
-  cout << "\033[0;32m" << "SPEEDTEST 3: lemon minflow against IBFS maxflow\n";
+  cout << "\033[0;32m" << "SPEEDTEST 3: lemon minflow against (alt) IBFS maxflow\n";
   cout << "\033[0;0m" << "Time required for minflow computation: " << (after_minflow - begin_time) << "\n";
   cout << "Time required for decomposition: " << (after_maxflow - after_minflow) << " (flow) + " << (after_decomposition - after_maxflow) << " (decomposition) \n\n";
 
 }
+
+void speedtest5(int k, int n, int m)
+{
+    
+  ListDigraph g;
+  ListDigraph::ArcMap<int> demands(g);
+  ListDigraph::ArcMap<int> weights(g);
+  createKPathGraph(g, k,n,m, weights, demands);
+    
+  ListDigraph::Node s, t;
+  
+  s = addSource(g);
+  t = addSink(g);
+
+  //MINFLOW
+
+  clock_t begin_time = clock();
+  ListDigraph::Arc extraArc = g.addArc(s, t);
+  CostScaling<ListDigraph> costScaling(g);
+
+  costScaling.lowerMap(demands);
+  costScaling.costMap(weights);
+  costScaling.stSupply(s, t, 1000);
+  costScaling.run();
+
+  ListDigraph::ArcMap<int> minmin(g);
+  for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
+    minmin[a] = costScaling.flow(a);
+  }
+  
+  g.erase(extraArc);
+  clock_t after_minflow = clock();
+
+  //DECOMPOSITION
+
+  ListDigraph::NodeMap<int> labels(g);
+  int label_counter = 0;
+  for (ListDigraph::NodeIt n(g); n != INVALID; ++n)
+  {
+    labels[n] = label_counter;
+    label_counter++;
+  }
+
+  ListDigraph::ArcMap<int> flow(g);
+  find_minflow_IBFS(g, demands, flow,labels,  s, t);
+
+
+
+  clock_t after_maxflow = clock();
+
+  vector<ListDigraph::Node*> decomposition;
+
+  //decompose_graph(g, flow, s, t, decomposition);
+
+  clock_t after_decomposition = clock();
+  
+  cout << "\033[0;32m" << "SPEEDTEST 5: lemon minflow against IBFS maxflow\n";
+  cout << "\033[0;0m" << "Time required for minflow computation: " << (after_minflow - begin_time) << "\n";
+  cout << "Time required for decomposition: " << (after_maxflow - after_minflow) << " (flow) + " << (after_decomposition - after_maxflow) << " (decomposition) \n\n";
+
+}
+
+void speedtest6(int k, int n, int m)
+{
+    
+  ListDigraph g;
+  ListDigraph::ArcMap<int> demands(g);
+  ListDigraph::ArcMap<int> weights(g);
+  createKPathGraph(g, k,n,m, weights, demands);
+    
+  ListDigraph::Node s, t;
+  
+  s = addSource(g);
+  t = addSink(g);
+
+  //MINFLOW
+
+  clock_t begin_time = clock();
+  ListDigraph::Arc extraArc = g.addArc(s, t);
+  CostScaling<ListDigraph> costScaling(g);
+
+  costScaling.lowerMap(demands);
+  costScaling.costMap(weights);
+  costScaling.stSupply(s, t, 1000);
+  costScaling.run();
+
+  ListDigraph::ArcMap<int> minmin(g);
+  for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
+    minmin[a] = costScaling.flow(a);
+  }
+  
+  g.erase(extraArc);
+  clock_t after_minflow = clock();
+
+  //DECOMPOSITION
+  
+  ListDigraph::ArcMap<int> flow(g);
+  find_minflow_new(g, flow, demands, s, t);
+
+  //drawGraphToFileWithArcMap(g, flow)
+
+  cout << "MINFLOW DONE\n";
+
+
+  clock_t after_maxflow = clock();
+
+  vector<ListDigraph::Node*> decomposition;
+
+  decompose_graph(g, flow, s, t, decomposition);
+
+  clock_t after_decomposition = clock();
+  
+  cout << "\033[0;32m" << "SPEEDTEST 6: lemon minflow against new minflow\n";
+  cout << "\033[0;0m" << "Time required for minflow computation: " << (after_minflow - begin_time) << "\n";
+  cout << "Time required for decomposition: " << (after_maxflow - after_minflow) << " (flow) + " << (after_decomposition - after_maxflow) << " (decomposition) \n\n";
+
+}
+
+
 /**
 
 void speedtest3(int k, int n, int m)
@@ -377,7 +508,9 @@ int main(){
   //speedtest1(k,n,m);
   speedtest2(k,n,m);
   speedtest3(k,n,m);
-  speedtest4(k,n,m);
+  //speedtest4(k,n,m);
+  speedtest5(k,n,m);
+  speedtest6(k,n,m);
 
   return 0;
 }

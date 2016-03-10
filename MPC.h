@@ -13,4 +13,6 @@ void find_feasible_flow_alt(ListDigraph& g, ListDigraph::ArcMap<int>& demands, L
 
 void find_minflow_alt(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t, int max_paths);
 
+void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t);
+
 #endif /* MPC_H_ */
