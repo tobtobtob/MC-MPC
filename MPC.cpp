@@ -229,13 +229,14 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
 
   g.erase(extraArc);
   g.erase(extraNode);
-
+  return false;
 }
 
 void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t)
 {
 
   find_feasible_flow_topsort(g, flow, s, t);
-  while(find_augmenting_path(g, flow, demands, s, t));
+  while(find_augmenting_path(g, flow, demands, s, t)){
+  }
 
 }

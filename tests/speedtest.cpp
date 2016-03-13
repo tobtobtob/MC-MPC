@@ -322,7 +322,6 @@ void speedtest6(int k, int n, int m)
 
   //drawGraphToFileWithArcMap(g, flow)
 
-  cout << "MINFLOW DONE\n";
 
 
   clock_t after_maxflow = clock();
@@ -386,7 +385,7 @@ int main(){
 
   int k = 10;
   int n = 1000;
-  int m = 10000;
+  int m = 1000;
 
   //speedtest1(k,n,m);
   speedtest2(k,n,m);
