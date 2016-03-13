@@ -105,82 +105,6 @@ void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph
   
 }
 
-void find_feasible_flow_alt(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow, int max_paths)
-{ 
-  for (ListDigraph::ArcIt a(g); a != INVALID; ++a)
-  {
-    if(flow[a] < max_paths){
-      flow[a] += max_paths;
-      //the flow is created by tracking an arbitrary path from the edge to source and sink
-      ListDigraph::Node node = g.source(a);
-      
-      //when we find a node with no incoming arcs, we have reached the source and the loop will end     
-      while(countInArcs(g, node) > 0){
-        ListDigraph::Arc tempArc;
-        bool found = false;
-        for(ListDigraph::InArcIt ia(g, node); ia != INVALID; ++ia){
-          if(flow[ia] < max_paths){
-            tempArc = ia;
-            found = true;
-            break;
-          }
-        }
-        if(!found){
-          ListDigraph::InArcIt tempIa(g, node);
-          tempArc = tempIa;
-        }
-        flow[tempArc] += max_paths;
-        node = g.source(tempArc);
-      }
-      
-      node = g.target(a);
-      while(countOutArcs(g, node) > 0){
-        ListDigraph::Arc tempArc;
-        bool found = false;
-        for(ListDigraph::OutArcIt oa(g, node); oa != INVALID; ++oa){
-          if(flow[oa] < max_paths){
-            tempArc = oa;
-            found = true;
-            break;
-          }
-        }
-        if(!found){
-          ListDigraph::OutArcIt tempOa(g, node);
-          tempArc = tempOa;
-        }
-        flow[tempArc] += max_paths;
-        node = g.target(tempArc);
-      }
-    }
-  }
-}
-
-//find minflow by reducing the maximal amount of flow (with maxflow) from a feasible flow
-void find_minflow_alt(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t, int max_paths)
-{
-
-  clock_t begin_time = clock();
-  ListDigraph::ArcMap<int> feasible_flow(g);
-  find_feasible_flow_alt(g, demands, feasible_flow, max_paths);
-  
-  ListDigraph::ArcMap<int> capacities(g);
-  for (ListDigraph::ArcIt a(g); a != INVALID; ++a)
-  {
-    capacities[a] = feasible_flow[a] - demands[a];
-  }
-
-  Preflow<ListDigraph, ListDigraph::ArcMap<int> > edmonds(g, capacities, s, t);
-  
-  edmonds.run();
-
-  
-  //then calculate the final flow
-  
-  for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
-    flow[a] = feasible_flow[a] - edmonds.flow(a);
-  }
-  
-}
 
 void find_feasible_flow_topsort(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t)
 {
@@ -249,12 +173,13 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
 
   //the boolean value tells if it is a forward arc
   stack<pair<ListDigraph::Arc, bool> > path;
+  ListDigraph::Node extraNode = g.addNode();
+  ListDigraph::Arc extraArc = g.addArc(extraNode, s);
+  visited[extraNode] = true;
+  path.push(make_pair(extraArc, true));
 
-  for(ListDigraph::OutArcIt o(g, s); o != INVALID; ++o){
-    if(flow[o] - demands[o] > 0){
-      path.push(make_pair(o, true));
-    }
-  }
+  ListDigraph::ArcMap<bool> arcUsed(g, false);
+  arcUsed[extraArc] = true;
 
   loop: while(!path.empty()){
 
@@ -262,14 +187,27 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
     ListDigraph::Node currentNode;
     if(path.top().second){
       currentNode = g.target(currentArc);
-      flow[currentArc]--;
     }
     else{
       currentNode = g.source(currentArc);
-      flow[currentArc]++;
     }
 
-    if(currentNode == t) return true;
+    visited[currentNode] = true;
+
+    if(currentNode == t){
+      while(!path.empty()){
+        if(path.top().second){
+          flow[path.top().first]--;
+        }else{
+          flow[path.top().first]++;
+        }
+        path.pop();
+      }
+
+        g.erase(extraArc);
+        g.erase(extraNode);
+      return true;
+    }
 
     //check the forward arcs for any >1 flow
     for(ListDigraph::OutArcIt o(g, currentNode); o != INVALID; ++o){
@@ -286,60 +224,18 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
       }
     }
 
-    visited[currentNode] = true;
-    if(path.top().second){
-      flow[currentArc]++;
-    }
-    else{
-      flow[currentArc]--;
-    }
     path.pop();
   }
 
-  return false;
-}
+  g.erase(extraArc);
+  g.erase(extraNode);
 
-void duu(ListDigraph& g, ListDigraph::ArcMap<int>& map){
-  ofstream myfile;
-  myfile.open("graph.dot");
-  myfile << "digraph g {\n";
-  for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
-  {
-    myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
-  }
-  myfile << "}\n";
-  myfile.close();
-}
-void daa(ListDigraph& g, ListDigraph::ArcMap<int>& map){
-  ofstream myfile;
-  myfile.open("graph1.dot");
-  myfile << "digraph g {\n";
-  for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
-  {
-    myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
-  }
-  myfile << "}\n";
-  myfile.close();
 }
 
 void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t)
 {
 
-  ListDigraph::NodeMap<int> top_order(g);
-  topologicalSort(g, top_order);
-
   find_feasible_flow_topsort(g, flow, s, t);
+  while(find_augmenting_path(g, flow, demands, s, t));
 
-  //duu(g, flow);
-  /**
-  for(ListDigraph::OutArcIt o(g, s); o !=INVALID; ++o){
-    cout << flow[o] << " ";
-  }
-  cout << "\n";
-  **/
-
-  while(find_augmenting_path(g, flow, demands, s, t)){
-    cout << "path found\n";
-  }  
-  //daa(g, flow);
 }

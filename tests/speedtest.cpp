@@ -221,123 +221,6 @@ void speedtest2(int k, int n, int m)
 
 }
 
-void speedtest4(int k, int n, int m)
-{
-  
-  srand(time(NULL));
-  ListDigraph g;
-  ListDigraph::ArcMap<int> demands(g);
-  ListDigraph::ArcMap<int> weights(g);
-  createKPathGraph(g, k,n,m, weights, demands);
-    
-  ListDigraph::Node s, t;
-  
-  s = addSource(g);
-  t = addSink(g);
-
-  //MINFLOW
-
-  clock_t begin_time = clock();
-
-  CostScaling<ListDigraph> costScaling(g);
-
-  costScaling.lowerMap(demands);
-  costScaling.costMap(weights);
-
-  ListDigraph::Arc extraArc = g.addArc(s, t);
-  costScaling.stSupply(s, t, 1000);
-  bool result = costScaling.run();
-
-  clock_t after_minflow = clock();
-
-  g.erase(extraArc);
-
-  //DECOMPOSITION
-
-  ListDigraph::ArcMap<int> minflow(g);
-
-  find_minflow_alt(g, demands, minflow, s, t, k+1);
-
-  clock_t after_maxflow = clock();
-
-  int num_ants = 0;
-  for (ListDigraph::OutArcIt o(g, s); o != INVALID; ++o)
-  {
-    num_ants += minflow[o];
-  }
-  vector<ListDigraph::Node*> decomposition;
-
-  decompose_graph(g, minflow, s, t, decomposition);
-
-  clock_t after_decomposition = clock();
-  
-  cout  << "\033[0;32m" << "SPEEDTEST 4: decomposition with alternative MPC\n";
-  cout << "\033[0;0m" << "Time required for minflow computation: " << (after_minflow - begin_time) << "\n";
-  cout << "Time required for decomposition: " << (after_maxflow - after_minflow) << " (flow) + " << (after_decomposition - after_maxflow) << " (decomposition) \n\n";
-
-}
-
-
-void speedtest3(int k, int n, int m)
-{
-    
-  ListDigraph g;
-  ListDigraph::ArcMap<int> demands(g);
-  ListDigraph::ArcMap<int> weights(g);
-  createKPathGraph(g, k,n,m, weights, demands);
-    
-  ListDigraph::Node s, t;
-  
-  s = addSource(g);
-  t = addSink(g);
-
-  //MINFLOW
-
-  clock_t begin_time = clock();
-  ListDigraph::Arc extraArc = g.addArc(s, t);
-  CostScaling<ListDigraph> costScaling(g);
-
-  costScaling.lowerMap(demands);
-  costScaling.costMap(weights);
-  costScaling.stSupply(s, t, 1000);
-  costScaling.run();
-
-  ListDigraph::ArcMap<int> minmin(g);
-  for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
-    minmin[a] = costScaling.flow(a);
-  }
-  
-  g.erase(extraArc);
-  clock_t after_minflow = clock();
-
-  //DECOMPOSITION
-
-  ListDigraph::NodeMap<int> labels(g);
-  int label_counter = 0;
-  for (ListDigraph::NodeIt n(g); n != INVALID; ++n)
-  {
-    labels[n] = label_counter;
-    label_counter++;
-  }
-
-  ListDigraph::ArcMap<int> flow(g);
-  find_minflow_ibfs_alt(g, demands, flow, labels, s, t, k+1);
-
-
-
-  clock_t after_maxflow = clock();
-
-  vector<ListDigraph::Node*> decomposition;
-
-  //decompose_graph(g, flow, s, t, decomposition);
-
-  clock_t after_decomposition = clock();
-  
-  cout << "\033[0;32m" << "SPEEDTEST 3: lemon minflow against (alt) IBFS maxflow\n";
-  cout << "\033[0;0m" << "Time required for minflow computation: " << (after_minflow - begin_time) << "\n";
-  cout << "Time required for decomposition: " << (after_maxflow - after_minflow) << " (flow) + " << (after_decomposition - after_maxflow) << " (decomposition) \n\n";
-
-}
 
 void speedtest5(int k, int n, int m)
 {
@@ -502,12 +385,12 @@ void speedtest3(int k, int n, int m)
 int main(){
 
   int k = 10;
-  int n = 10000;
+  int n = 1000;
   int m = 10000;
 
   //speedtest1(k,n,m);
   speedtest2(k,n,m);
-  speedtest3(k,n,m);
+  //speedtest3(k,n,m);
   //speedtest4(k,n,m);
   speedtest5(k,n,m);
   speedtest6(k,n,m);
