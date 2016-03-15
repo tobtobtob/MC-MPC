@@ -384,8 +384,8 @@ void speedtest3(int k, int n, int m)
 int main(){
 
   int k = 10;
-  int n = 1000;
-  int m = 1000;
+  int n = 10000;
+  int m = 100000;
 
   //speedtest1(k,n,m);
   speedtest2(k,n,m);

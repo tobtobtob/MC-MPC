@@ -165,6 +165,65 @@ void find_feasible_flow_topsort(ListDigraph& g, ListDigraph::ArcMap<int>& flow, 
   }
 }
 
+void find_feasible_flow_most_uncovered(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t){
+  int num_nodes = countNodes(g);
+  ListDigraph::NodeMap<int> top_order(g);
+  topologicalSort(g, top_order);
+  ListDigraph::Node top_nodes[num_nodes];
+
+  ListDigraph::NodeMap<bool> covered(g);
+  covered[s] = true;
+  covered[t] = true;
+
+  //top nodes will have nodes in descending topological order
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    top_nodes[num_nodes-top_order[n]-1] = n;
+  }
+
+  //this node map tells us the maximum number of uncovered nodes reachable from this node via single path
+  ListDigraph::NodeMap<int> uncovered(g, 0);
+
+  while(true){
+
+    //update uncovered
+    for(int i = 0; i < num_nodes; i++){
+      ListDigraph::Node temp = top_nodes[i];
+      uncovered[temp] = 0;
+      for (ListDigraph::OutArcIt o(g, temp); o != INVALID; ++o)
+      {
+       uncovered[temp] = max(uncovered[g.target(o)], uncovered[temp]);
+      }
+      if(!covered[temp]){
+        uncovered[temp]++;
+      }
+    }
+
+    ListDigraph::Node current = s;
+    while(current != t){
+      int max_uncovered = 0;
+      ListDigraph::Arc nextArc;
+      for(ListDigraph::OutArcIt o(g, current); o != INVALID; ++o){
+        if(uncovered[g.target(o)] > max_uncovered){
+          nextArc = o;
+          max_uncovered = uncovered[g.target(o)];
+        }
+      }
+      //if there is no uncovered nodes at the source, every node is covered and we are ready
+      //else we just choose an arbitrary edge (there are no reachable uncovered nodes)
+      if(max_uncovered == 0){
+        if(current == s) return;
+        ListDigraph::OutArcIt o(g, current);
+        nextArc = o;
+      }
+
+      flow[nextArc]++;
+      current = g.target(nextArc);
+      covered[current] = true;
+    }
+  }
+
+}
+
 //returns true if an augmenting path is found, false otherwise.  
 bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t)
 {
@@ -235,7 +294,7 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
 void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t)
 {
 
-  find_feasible_flow_topsort(g, flow, s, t);
+  find_feasible_flow_most_uncovered(g, flow, s, t);
   while(find_augmenting_path(g, flow, demands, s, t)){
   }
 
