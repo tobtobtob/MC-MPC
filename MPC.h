@@ -9,6 +9,6 @@ void find_feasible_flow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListD
 
 void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t);
 
-void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t);
+void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t);
 
 #endif /* MPC_H_ */

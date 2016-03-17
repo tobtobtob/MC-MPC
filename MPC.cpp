@@ -237,8 +237,6 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
   visited[extraNode] = true;
   path.push(make_pair(extraArc, true));
 
-  ListDigraph::ArcMap<bool> arcUsed(g, false);
-  arcUsed[extraArc] = true;
 
   loop: while(!path.empty()){
 
@@ -291,11 +289,93 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
   return false;
 }
 
-void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::ArcMap<int>& demands, ListDigraph::Node s, ListDigraph::Node t)
+//returns true if an augmenting path is found, false otherwise. This uses no demands on arcs
+bool find_augmenting_path_no_demands(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t)
+{
+
+  ListDigraph::NodeMap<bool> visited(g, false);
+  visited[s] = true;
+
+  //the boolean value tells if it is a forward arc
+  stack<pair<ListDigraph::Arc, bool> > path;
+  ListDigraph::Node extraNode = g.addNode();
+  ListDigraph::Arc extraArc = g.addArc(extraNode, s);
+  visited[extraNode] = true;
+  path.push(make_pair(extraArc, true));
+
+  ListDigraph::NodeMap<int> flow_on_node(g);
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    for(ListDigraph::OutArcIt o(g, n); o != INVALID; ++o){
+      flow_on_node[n] += flow[o];
+    }
+  }
+
+  ListDigraph::ArcMap<pair<bool, bool> > visitedArc(g, make_pair(false, false));
+
+  loop: while(!path.empty()){
+    //cout << "poop\n";
+
+    ListDigraph::Arc currentArc = path.top().first;
+    ListDigraph::Node currentNode;
+    if(path.top().second){
+      currentNode = g.target(currentArc);
+      visitedArc[currentArc].first = true;
+    }
+    else{
+      currentNode = g.source(currentArc);
+      visitedArc[currentArc].second = true;
+    }
+
+    visited[currentNode] = true;
+
+    if(currentNode == t){
+      while(!path.empty()){
+        if(path.top().second){
+          
+          flow_on_node[g.source(path.top().first)]--;
+          flow[path.top().first]--;
+        }else{
+          flow[path.top().first]++;
+          flow_on_node[g.source(path.top().first)]++;
+        }
+        path.pop();
+      }
+
+        g.erase(extraArc);
+        g.erase(extraNode);
+      return true;
+    }
+
+    //we can use forward arcs only if there is extra flow on that node
+    if(flow_on_node[currentNode] > 1 || !path.top().second){
+
+      for(ListDigraph::OutArcIt o(g, currentNode); o != INVALID; ++o){
+        if(flow[o] > 0 && !visitedArc[o].first && o != currentArc){
+          path.push(make_pair(o, true));
+          goto loop;
+        }
+      }
+    }
+    //and the backward arcs
+    for(ListDigraph::InArcIt i(g, currentNode); i != INVALID; ++i){
+      if(!visitedArc[i].second && i != currentArc){
+        path.push(make_pair(i, false));
+        goto loop;
+      }
+    }
+
+    path.pop();
+  }
+
+  g.erase(extraArc);
+  g.erase(extraNode);
+  return false;
+}
+
+void find_minflow_new(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t)
 {
 
   find_feasible_flow_most_uncovered(g, flow, s, t);
-  while(find_augmenting_path(g, flow, demands, s, t)){
+  while(find_augmenting_path_no_demands(g, flow, s, t)){   
   }
-
 }

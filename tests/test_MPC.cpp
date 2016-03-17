@@ -16,30 +16,23 @@ TEST_CASE("simple test case succeeds"){
   ListDigraph::Node t = g.addNode();
   ListDigraph::Node a = g.addNode();
   ListDigraph::Node b = g.addNode();
-  ListDigraph::Node c = g.addNode();
   
   ListDigraph::Arc sa = g.addArc(s, a);
   ListDigraph::Arc sb = g.addArc(s, b);
-  ListDigraph::Arc ac = g.addArc(a, c);
-  ListDigraph::Arc bc = g.addArc(b, c);
-  ListDigraph::Arc ct = g.addArc(c, t);
+  ListDigraph::Arc ab = g.addArc(a, b);
   ListDigraph::Arc bt = g.addArc(b, t);
+  ListDigraph::Arc at = g.addArc(a, t);
   
   
-  ListDigraph::ArcMap<int> demand(g);
-  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    demand[ai] = 1;
-  }
   ListDigraph::ArcMap<int> flow(g);
   
-  find_minflow(g, demand, flow, s, t);
+  find_minflow_new(g, flow, s, t);
   
-  REQUIRE(flow[ct] == 2);
   REQUIRE(flow[sa] == 1);
-  REQUIRE(flow[sb] == 2);
-  REQUIRE(flow[bc] == 1);
-  REQUIRE(flow[ac] == 1);
+  REQUIRE(flow[ab] == 1);
   REQUIRE(flow[bt] == 1);
+  REQUIRE(flow[sb] == 0);
+  REQUIRE(flow[at] == 0);
         
 }
 TEST_CASE("Another simple test case succeeds"){
@@ -60,57 +53,34 @@ TEST_CASE("Another simple test case succeeds"){
   ListDigraph::Arc dc = g.addArc(d, c);
   ListDigraph::Arc ce = g.addArc(c, e);
   ListDigraph::Arc et = g.addArc(e, t);
+  ListDigraph::Arc ab = g.addArc(a, b);
+  ListDigraph::Arc de = g.addArc(d, e);
   
-  
-  ListDigraph::ArcMap<int> demand(g);
-  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    demand[ai] = 1;
-  }
+
   ListDigraph::ArcMap<int> flow(g);
   
-  find_minflow(g, demand, flow, s, t);
+  find_minflow_new(g, flow, s, t);
   
   REQUIRE(flow[bt]+flow[et] == 2);
         
 }
 
-TEST_CASE("A bit more complicated test case succeeds"){
-  ListDigraph g;
-  ListDigraph::Node s = g.addNode();
-  ListDigraph::Node t = g.addNode();
-  ListDigraph::Node a = g.addNode();
-  ListDigraph::Node b = g.addNode();
-  ListDigraph::Node c = g.addNode();
-  ListDigraph::Node d = g.addNode();
-  ListDigraph::Node e = g.addNode();
-  ListDigraph::Node f = g.addNode();
-  
-  ListDigraph::Arc sa = g.addArc(s, a);
-  ListDigraph::Arc sd = g.addArc(s, d);
-  ListDigraph::Arc db = g.addArc(d, b);
-  ListDigraph::Arc ab = g.addArc(a, b);
-  ListDigraph::Arc de = g.addArc(d, e);
-  ListDigraph::Arc bf = g.addArc(b, f);
-  ListDigraph::Arc bc = g.addArc(b, c);
-  ListDigraph::Arc ef = g.addArc(e, f); 
-  ListDigraph::Arc ct = g.addArc(c, t);
-  ListDigraph::Arc ft = g.addArc(f, t);
-  
-  
-  ListDigraph::ArcMap<int> demand(g);
-  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    demand[ai] = 1;
+void check_flow_on_nodes(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t){
+  for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+    if(n == s || n == t) continue;
+    int incoming_flow = 0;
+    for(ListDigraph::InArcIt i(g,n); i != INVALID; ++i){
+      incoming_flow += flow[i];
+    }
+    REQUIRE(incoming_flow > 0);
+    for(ListDigraph::OutArcIt o(g,n); o != INVALID; ++o){
+      incoming_flow -= flow[o];
+    }
+    REQUIRE(incoming_flow == 0);
   }
-  ListDigraph::ArcMap<int> flow(g);
-  
-  find_minflow(g, demand, flow, s, t);
-  
-  //check that total flow is minimum (3)
-  REQUIRE(flow[ct]+flow[ft] == 3);
-  
-    
-  
 }
+
+
 
 TEST_CASE("feasible minflow is generated for a random graph"){
   srand(time(NULL));
@@ -121,99 +91,48 @@ TEST_CASE("feasible minflow is generated for a random graph"){
   
   s = addSource(g);
   t = addSink(g);
-      
-  ListDigraph::ArcMap<int> demands(g);
-  ListDigraph::ArcMap<int> flow(g);
-  
 
-  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    demands[ai] = rand()%2;
-    flow[ai] = 0;
-    g.target(ai);
-  }
+  ListDigraph::ArcMap<int> flow(g, 0);
   
-  find_minflow(g, demands, flow, s, t);
-  
-  flow_satisfies_demands(g, flow, demands);
+  find_minflow_new(g, flow, s, t);
     
-  check_flow_conservation(g, flow);
+  check_flow_on_nodes(g, flow, s, t);
   
-
 }
 
 
-TEST_CASE("Minflow value is correct for a random graph"){
+TEST_CASE("feasible minflow is generated for a random graph 2"){
   srand(time(NULL));
   ListDigraph g;
-  createRandomGraph(g, 100, 0.9);
-    
+  createRandomGraph(g, 1000, 0.9);
+ 
   ListDigraph::Node s, t;
   
   s = addSource(g);
   t = addSink(g);
+
+  ListDigraph::ArcMap<int> flow(g, 0);
+  
+  find_minflow_new(g, flow, s, t);
+    
+  check_flow_on_nodes(g, flow, s, t);
+  
+}
+
+TEST_CASE("feasible minflow is generated for a random graph 3"){
+  srand(time(NULL));
+  ListDigraph g;
+  createRandomGraph(g, 1000, 0.6);
  
-    
-  ListDigraph::ArcMap<int> demand(g);
-  ListDigraph::ArcMap<int> cost(g);
-  ListDigraph::ArcMap<int> flow(g);
+  ListDigraph::Node s, t;
   
-  
-  for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-    demand[ai] = 1;
-    cost[ai] = 0;
-  }
-  
-  CostScaling<ListDigraph> costScaling(g);
-	costScaling.lowerMap(demand);
-	costScaling.costMap(cost);
+  s = addSource(g);
+  t = addSink(g);
 
-  int minflow_value = 0;
-  int problem_type = 0;
-  while(problem_type != 1){
-    minflow_value++;
-    costScaling.stSupply(s, t, minflow_value);
-    problem_type = costScaling.run();
+  ListDigraph::ArcMap<int> flow(g, 0);
+  
+  find_minflow_new(g, flow, s, t);
     
-  }
-	
-	find_minflow(g, demand, flow, s, t);
-	
-	int maxflow_counter = 0;
-	
-	for(ListDigraph::OutArcIt ia(g, s); ia != INVALID; ++ia){
-
-	  maxflow_counter += flow[ia];
-	}
-	REQUIRE(minflow_value == maxflow_counter);
+  check_flow_on_nodes(g, flow, s, t);
   
 }
-
-
-TEST_CASE("Feasible flow is found for a random graph"){
-    srand(time(NULL));
-    ListDigraph g;
-    createRandomGraph(g, 100, 0.9);
-    
-    ListDigraph::Node s, t;
-  
-    s = addSource(g);
-    t = addSink(g);
-    
-    ListDigraph::ArcMap<int> demands(g);
-    ListDigraph::ArcMap<int> flow(g);
-    
-    
-    
-    for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
-        demands[ai] = rand()%2;
-        flow[ai] = 0;
-    }
-    
-    find_feasible_flow(g, demands, flow);
-
-    flow_satisfies_demands(g, flow, demands);
-    
-    check_flow_conservation(g, flow);
-
-}
-

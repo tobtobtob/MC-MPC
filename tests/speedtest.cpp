@@ -385,7 +385,7 @@ int main(){
 
   int k = 10;
   int n = 10000;
-  int m = 100000;
+  int m = 10000;
 
   //speedtest1(k,n,m);
   speedtest2(k,n,m);
