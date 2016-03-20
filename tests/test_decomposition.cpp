@@ -40,7 +40,7 @@ TEST_CASE("MACs are found in an easy test case")
   }
   ListDigraph::ArcMap<int> minflow(g);
 
-  find_minflow(g, demand, minflow, s, t);
+  find_minflow_new(g, minflow, s, t);
 
   int num_ants = 0;
   for (ListDigraph::OutArcIt o(g, s); o != INVALID; ++o)
@@ -79,7 +79,7 @@ TEST_CASE("MACs are found in a random graph")
     counter++;
   }
     
-  find_minflow(g, demands, minflow, s, t);
+  find_minflow_new(g, minflow, s, t);
   int num_ants = 0;
   for (ListDigraph::OutArcIt o(g, s); o != INVALID; ++o)
   {

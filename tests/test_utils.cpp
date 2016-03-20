@@ -1,17 +1,13 @@
-/*
- * test_utils.cpp
- *
- *  Created on: Nov 29, 2015
- *      Author: topi
- */
-
 #include <lemon/list_graph.h>
 #include <stdlib.h>
 #include <time.h>
 #include <lemon/bfs.h>
 #include "catch.hpp"
- #include <iostream>
+#include <iostream>
 #include <fstream>
+#include <lemon/adaptors.h>
+#include <lemon/connectivity.h>
+#include <vector>
 
 
 
@@ -230,4 +226,34 @@ void check_flow_conservation(ListDigraph& g, ListDigraph::ArcMap<int>& flow){
   }
 }
 
+//splits graph into connected components
+void split_graph(ListDigraph& g, vector<ListDigraph*>& graphs){
 
+	Undirector<ListDigraph> undirected(g);
+	ListDigraph::NodeMap<int> components(g);
+	stronglyConnectedComponents(undirected, components);
+
+	int num_subgraphs = 0;
+	for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+		if(components[n] > num_subgraphs) num_subgraphs = components[n];
+	}
+	num_subgraphs++;
+	ListDigraph::NodeMap<ListDigraph::Node> map(g);
+
+	for(int i = 0; i < num_subgraphs; i++){
+		ListDigraph temp;
+		for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+			if(components[n] == i){
+				map[n] = temp.addNode();
+			}
+		}
+		for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+			if(components[n] == i){
+				for(ListDigraph::OutArcIt o(g, n); o != INVALID; ++o){
+					temp.addArc(map[g.source(o)], map[g.target(o)]);
+				}
+			}
+		}
+		graphs.push_back(&temp);
+	}
+}

@@ -31,4 +31,6 @@ void drawGraphToFile(ListDigraph& g);
 
 void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map);
 
+void split_graph(ListDigraph& g, vector<ListDigraph*>& graphs);
+
 #endif /* TESTS_TEST_UTILS_H_ */
