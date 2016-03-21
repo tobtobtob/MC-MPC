@@ -8,3 +8,6 @@ test_debug:
 
 speedtest:
 	g++ -o run_tests MPC.cpp decomposition.cpp tests/speedtest.cpp IBFS/ibfs.cpp MPC_IBFS.cpp -lemon
+
+overlap_test:
+	g++ -o run_tests MPC.cpp decomposition.cpp tests/test_overlap_graph.cpp -lemon

@@ -318,7 +318,7 @@ void speedtest6(int k, int n, int m)
   //DECOMPOSITION
   
   ListDigraph::ArcMap<int> flow(g);
-  find_minflow_new(g, flow, demands, s, t);
+  find_minflow_new(g, flow, s, t);
 
   //drawGraphToFileWithArcMap(g, flow)
 
