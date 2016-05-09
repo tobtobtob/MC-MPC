@@ -33,7 +33,8 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 
 	//Extract paths from the graph according to the minflow and create reachability tables
 
-	vector<ListDigraph::Node> paths[num_paths];
+	//vector<ListDigraph::Node> paths[num_paths];
+	vector<ListDigraph::Node>* paths = new vector<ListDigraph::Node>[num_paths];
 	ListDigraph::NodeMap<int*> reachable(g);
 
 	for (int i = 0; i < num_paths; ++i)

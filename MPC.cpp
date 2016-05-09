@@ -112,7 +112,8 @@ void find_feasible_flow_topsort(ListDigraph& g, ListDigraph::ArcMap<int>& flow, 
   int num_nodes = countNodes(g);
   ListDigraph::NodeMap<int> top_order(g);
   topologicalSort(g, top_order);
-  ListDigraph::Node top_nodes[num_nodes];
+
+  ListDigraph::Node* top_nodes = new ListDigraph::Node[num_nodes];
 
   ListDigraph::NodeMap<bool> covered(g);
   covered[s] = true;
@@ -169,7 +170,8 @@ void find_feasible_flow_most_uncovered(ListDigraph& g, ListDigraph::ArcMap<int>&
   int num_nodes = countNodes(g);
   ListDigraph::NodeMap<int> top_order(g);
   topologicalSort(g, top_order);
-  ListDigraph::Node top_nodes[num_nodes];
+  //ListDigraph::Node top_nodes[num_nodes];
+  ListDigraph::Node* top_nodes = new ListDigraph::Node[num_nodes];
 
   ListDigraph::NodeMap<bool> covered(g);
   covered[s] = true;

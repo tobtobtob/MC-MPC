@@ -22,7 +22,8 @@ void find_minflow_IBFS(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDi
 
 
   //we need a special labeling for IBFS, because we won't have s and t there
-  ListDigraph::Node label_to_node[num_nodes];
+  //ListDigraph::Node label_to_node[num_nodes];
+  ListDigraph::Node* label_to_node = new ListDigraph::Node[num_nodes];
   ListDigraph::NodeMap<int> labels_ibfs(g);
   int index_counter = 0;
   for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
@@ -46,7 +47,8 @@ void find_minflow_IBFS(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDi
 **/
 
   ListDigraph::ArcMap<int> arc_labels(g);
-  ListDigraph::Arc arc_labels_reverse[num_arcs];
+  //ListDigraph::Arc arc_labels_reverse[num_arcs];
+  ListDigraph::Arc* arc_labels_reverse = new ListDigraph::Arc[num_arcs];
 
   int counter = 0;
   for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
@@ -63,14 +65,14 @@ void find_minflow_IBFS(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDi
       g_ibfs->addNode(labels_ibfs[g.source(a)], MAX_CAPACITY, 0);
     }
     else{
-      g_ibfs->addEdge(labels_ibfs[g.target(a)], labels_ibfs[g.source(a)], feasible_flow[a]-demands[a], MAX_CAPACITY, arc_labels[a]);    
+      g_ibfs->addEdge(labels_ibfs[g.target(a)], labels_ibfs[g.source(a)], feasible_flow[a]-demands[a], MAX_CAPACITY);    
     }
   }
 
   g_ibfs->initGraph();
   g_ibfs->computeMaxFlow();
 
-
+/**
 
   while(g_ibfs->arcs != g_ibfs->arcEnd){
 
@@ -101,7 +103,7 @@ void find_minflow_IBFS(ListDigraph& g, ListDigraph::ArcMap<int>& demands, ListDi
       flow[i] += flow[ia];
     }
   }
-
+**/
 
   
 }
