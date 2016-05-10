@@ -11,3 +11,9 @@ speedtest:
 
 overlap_test:
 	g++ -o run_tests MPC.cpp decomposition.cpp tests/test_overlap_graph.cpp -lemon
+
+speedtest_mac:
+	g++ -o run_tests -I/usr/local/include MPC.cpp decomposition.cpp tests/speedtest.cpp IBFS/ibfs.cpp MPC_IBFS.cpp
+
+overlap_test_mac:
+	g++ -o run_tests -I/usr/local/include MPC.cpp decomposition.cpp tests/test_overlap_graph.cpp
