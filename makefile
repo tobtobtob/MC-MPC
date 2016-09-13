@@ -17,3 +17,6 @@ speedtest_mac:
 
 overlap_test_mac:
 	g++ -o run_tests -I/usr/local/include MPC.cpp decomposition.cpp tests/test_overlap_graph.cpp
+
+solver_test_mac:
+	g++ -o run_tests -I/usr/local/include MC_MPC_solver.cpp tests/test_MC_MPC_solver.cpp
