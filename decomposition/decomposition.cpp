@@ -148,7 +148,7 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 		}
 	}
 	// Color all the uncolored nodes with the last color
-	while(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+	for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
 		if(decomposition[n] == 0) decomposition[n] = color;
 	}
 
