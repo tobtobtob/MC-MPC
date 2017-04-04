@@ -24,7 +24,7 @@ bool is_MAC(ListDigraph::NodeMap<int*>& reachable, vector<ListDigraph::Node>* pa
 	return true;
 }
 
-void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, ListDigraph::NodeMap<int>& decomposition){
+void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, ListDigraph::ArcMap<int>& decomposition){
 
 	int num_paths = 0;
 	for(ListDigraph::OutArcIt o(g, s); o != INVALID; ++o){
@@ -122,7 +122,11 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			for (int i = 0; i < num_paths; ++i)
 			{
 				ants[i]++;
-				decomposition[paths[i][ants[i]]] = color;
+				//after moving an ant, color all the incoming arcs with the current color
+				ListDigraph::Node current = paths[i][ants[i]];
+				for(ListDigraph::InArcIt ai(g, current); ai != INVALID; ++ai){
+					decomposition[ai] = color;
+				}
 			}
 		}
 
@@ -134,7 +138,11 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			{
 				while(can_reach_another_node(i, reachable, paths, ants, num_paths) && paths[i][ants[i]] != t){
 					ants[i]++;
-					decomposition[paths[i][ants[i]]] = color;
+					//after moving an ant, color all the incoming arcs with the current color
+					ListDigraph::Node current = paths[i][ants[i]];
+					for(ListDigraph::InArcIt ai(g, current); ai != INVALID; ++ai){
+						decomposition[ai] = color;
+					}
 				}
 			}
 		}
@@ -147,9 +155,12 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			}
 		}
 	}
-	// Color all the uncolored nodes with the last color
-	for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
-		if(decomposition[n] == 0) decomposition[n] = color;
+
+	//color all the remaining arcs with the last color
+	for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
+		if(decomposition[a] == 0){
+			decomposition[a] = color;
+		}
 	}
 
 
