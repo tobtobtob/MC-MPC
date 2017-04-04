@@ -6,8 +6,6 @@
 using namespace lemon;
 using namespace std;
 
-void create_reachability_table(ListDigraph& g, bool** reachability, int num_nodes, ListDigraph::Node source, ListDigraph::NodeMap<int>& labels);
-
-void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, std::vector<ListDigraph::Node*>& decomposition);
+void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigraph::Node s, ListDigraph::Node t, ListDigraph::NodeMap<int>& decomposition);
 
 #endif /* DECOMPOSITION_H_ */
