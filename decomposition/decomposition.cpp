@@ -162,6 +162,4 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			decomposition[a] = color;
 		}
 	}
-
-
 }
