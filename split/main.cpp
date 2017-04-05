@@ -12,7 +12,7 @@ int split(string filename, string output_folder);
 
 int main(int argc, char* argv[])
 {
-  if (argc < 2 || argc > 3){
+  if (argc != 3){
     cerr << "Usage: " << argv[0] << " GRAPH_FILENAME OUTPUT_FOLDER/" << endl;
     return 1;
   }
