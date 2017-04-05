@@ -110,8 +110,8 @@ void createMACGraph(ListDigraph& g, int num_paths, int path_length, ListDigraph:
 
 	srand(time(NULL));
 
-	ListDigraph::Node prev[num_paths];
-	ListDigraph::Node current[num_paths];
+	ListDigraph::Node *prev = new ListDigraph::Node[num_paths];
+	ListDigraph::Node *current = new ListDigraph::Node[num_paths];
 
 	for (int i = 0; i < num_paths; ++i)
 	{
