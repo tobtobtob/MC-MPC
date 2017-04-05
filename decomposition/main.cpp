@@ -24,7 +24,12 @@ int main(int argc, char* argv[])
 
 int decompose(string filename, string output_folder)
 {
-  //TODO: check that input graph and output folder exist and return an error code if not
+
+  std::ifstream infile(filename);
+  if(!infile.good()){
+    cerr << "ERROR: input file not found\n";
+    return 1;
+  }
 
   ListDigraph graph;
 
@@ -61,7 +66,7 @@ int decompose(string filename, string output_folder)
 
   //this index is just for output file names. there is not necessarily a decomposition for every normal index number
   int decomposition_index = 0;
-  
+
   for(int i = 0; i <= num_decompositions; i++)
   {
     ListDigraph temp;
