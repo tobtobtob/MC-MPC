@@ -92,7 +92,6 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
   ListDigraph::ArcMap<pair<bool, bool> > visitedArc(g, make_pair(false, false));
 
   loop: while(!path.empty()){
-    //cout << "poop\n";
 
     ListDigraph::Arc currentArc = path.top().first;
     ListDigraph::Node currentNode;

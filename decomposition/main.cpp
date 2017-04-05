@@ -9,10 +9,23 @@
 using namespace lemon;
 using namespace std;
 
-int main()
-{
+int decompose(string filename, string output_folder);
 
-  string filename = "example_graph.txt";
+int main(int argc, char* argv[])
+{
+  if (argc < 2 || argc > 3){
+    cerr << "Usage: " << argv[0] << " GRAPH_FILENAME OUTPUT_FOLDER/" << endl;
+    return 1;
+  }
+
+
+  return decompose(argv[1], argv[2]);
+}
+
+int decompose(string filename, string output_folder)
+{
+  //TODO: check that input graph and output folder exist and return an error code if not
+
   ListDigraph graph;
 
   ListDigraph::NodeMap<int> node_labels(graph);
@@ -38,15 +51,19 @@ int main()
   graph.erase(s);
   graph.erase(t);
 
-  int index = 1;
-  bool terminate_loop = false;
-  //TODO fix this
-  int max_loops = 10;
-  while(true)
-  {
-    if(index > max_loops) break;
-    terminate_loop = true;
+  //find the highest # of a decomposition
+  int num_decompositions = 0;
+  for(ListDigraph::ArcIt ai(graph); ai != INVALID; ++ai){
+    if(num_decompositions < decomposition[ai]) {
+      num_decompositions = decomposition[ai];
+    }
+  } 
 
+  //this index is just for output file names. there is not necessarily a decomposition for every normal index number
+  int decomposition_index = 0;
+  
+  for(int i = 0; i <= num_decompositions; i++)
+  {
     ListDigraph temp;
     ListDigraph::NodeMap<int> temp_node_labels(temp);
     ListDigraph::ArcMap<int> temp_arc_labels(temp);
@@ -56,10 +73,12 @@ int main()
     ListDigraph::Node null_node = graph.addNode();
     ListDigraph::NodeMap<ListDigraph::Node> mapping(graph, null_node);
 
-    for(ListDigraph::ArcIt a(graph); a != INVALID; ++a){
-      if(decomposition[a] == index){
+    bool decomposition_found = false;
 
-        terminate_loop = false;
+    for(ListDigraph::ArcIt a(graph); a != INVALID; ++a){
+
+      if(decomposition[a] == i){
+        decomposition_found = true;
         ListDigraph::Node source = graph.source(a);
         ListDigraph::Node target = graph.target(a);
 
@@ -78,17 +97,15 @@ int main()
       }
     }
 
-    if(terminate_loop == false){
-      string output_filename = filename + "_decomp_" + to_string(index);
+    if(decomposition_found == true){
+      string output_filename = output_folder + filename + "_decomp_" + to_string(decomposition_index);
       DigraphWriter<ListDigraph>(temp, output_filename)
         .nodeMap("label", temp_node_labels)
         .arcMap("label", temp_arc_labels)
         .arcMap("weight", temp_arc_weights)
         .run();
+      decomposition_index++;
     }
-
-    index++;
   }
-
   return 0;
 }
