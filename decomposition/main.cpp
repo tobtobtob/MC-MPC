@@ -53,14 +53,16 @@ int main()
     ListDigraph::ArcMap<int> temp_arc_weights(temp);
 
     //mapping from original graph to a decomposed part
-    ListDigraph::Node null_node;
+    ListDigraph::Node null_node = graph.addNode();
     ListDigraph::NodeMap<ListDigraph::Node> mapping(graph, null_node);
 
     for(ListDigraph::ArcIt a(graph); a != INVALID; ++a){
       if(decomposition[a] == index){
+
         terminate_loop = false;
         ListDigraph::Node source = graph.source(a);
         ListDigraph::Node target = graph.target(a);
+
         if(mapping[source] == null_node){
           mapping[source] = temp.addNode();
           temp_node_labels[mapping[source]] = node_labels[source];
@@ -69,6 +71,7 @@ int main()
           mapping[target] = temp.addNode();
           temp_node_labels[mapping[target]] = node_labels[target];
         }
+
         ListDigraph::Arc temp_arc = temp.addArc(mapping[source], mapping[target]);
         temp_arc_labels[temp_arc] = arc_labels[a];
         temp_arc_weights[temp_arc] = arc_weights[a];
