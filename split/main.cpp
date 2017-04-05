@@ -4,6 +4,7 @@
 #include <lemon/adaptors.h>
 #include <lemon/connectivity.h>
 #include <string.h>
+#include "../util/utils.h"
 
 using namespace lemon;
 using namespace std;
@@ -16,17 +17,19 @@ int main(int argc, char* argv[])
     cerr << "Usage: " << argv[0] << " GRAPH_FILENAME OUTPUT_FOLDER/" << endl;
     return 1;
   }
-
+  if(!file_exists(argv[1])){
+    cerr << "ERROR: input file not found\n";
+    return 1;
+  }
+  if(!directory_exists(argv[2])){
+    cerr << "ERROR: output directory not found\n";
+    return 1;
+  }
   return split(argv[1], argv[2]);
 }
 
 int split(string filename, string output_folder)
 {
-  std::ifstream infile(filename);
-  if(!infile.good()){
-    cerr << "ERROR: input file not found\n";
-    return 1;
-  }
 
   ListDigraph g;
 

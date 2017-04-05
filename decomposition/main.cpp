@@ -17,20 +17,20 @@ int main(int argc, char* argv[])
     cerr << "Usage: " << argv[0] << " GRAPH_FILENAME OUTPUT_FOLDER/" << endl;
     return 1;
   }
-
+  if(!file_exists(argv[1])){
+    cerr << "ERROR: input file not found\n";
+    return 1;
+  }
+  if(!directory_exists(argv[2])){
+    cerr << "ERROR: output directory not found\n";
+    return 1;
+  }
 
   return decompose(argv[1], argv[2]);
 }
 
 int decompose(string filename, string output_folder)
 {
-
-  std::ifstream infile(filename);
-  if(!infile.good()){
-    cerr << "ERROR: input file not found\n";
-    return 1;
-  }
-
   ListDigraph graph;
 
   ListDigraph::NodeMap<int> node_labels(graph);
