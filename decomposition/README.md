@@ -4,7 +4,7 @@ This is a decomposer for directed acyclic graphs, optimized for graphs with mini
 
 ## Usage
 
-Decomposer takes two arguments, input graph file name and output folder. Input (and output) graphs are in [LEMON graph format](http://lemon.cs.elte.hu/pub/tutorial/a00018.html). Only @nodes and @arcs sections are required. Nodes should have labels and arcs should have labels and weights. See the example `example_graph`. Decomposition parts are outputted in individual files named `filename + _decomp_ + index`.
+Decomposer takes two arguments, input graph file name and output folder. Input (and output) graphs are in [LEMON graph format](http://lemon.cs.elte.hu/pub/tutorial/a00018.html). Only @nodes and @arcs sections are required. Nodes should have labels and arcs should have labels and weights. See the example `example_graph`. Decomposition parts are outputted in individual files named `<filename> + _decomp_ + <index>`.
 
 ```
 mkdir output
