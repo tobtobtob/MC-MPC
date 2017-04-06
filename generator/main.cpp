@@ -7,26 +7,28 @@
 using namespace lemon;
 using namespace std;
 
+#define MAX_WEIGHT 1000
+
 void createKPathGraph(string output_filename, int k, int n, int m);
 
 int main(int argc, char* argv[])
 {
   if (argc != 5){
-    cerr << "Usage: " << argv[0] << " OUTPUT_FILENAME NUM_PATHS NUM_NODES NUM_EXTRA_ARCS" << endl;
+    cerr << "Usage: " << argv[0] << " OUTPUT_FILENAME NUM_PATHS PATH_LENGTH NUM_EXTRA_ARCS" << endl;
     return 1;
   }
-  int num_paths, num_nodes;
+  int num_paths, path_length;
   float arc_prob;
   try {
     num_paths = stoi(argv[2]);
-    num_nodes = stoi(argv[3]);
+    path_length = stoi(argv[3]);
     arc_prob = stoi(argv[4]);
   } catch (const std::exception& e) {
     cerr << "ERROR: error reading numerical parameters\n";
     return 1;
   }
 
-  createKPathGraph(argv[1], num_paths, num_nodes, arc_prob);
+  createKPathGraph(argv[1], num_paths, path_length, arc_prob);
 
   return 0;
 }
@@ -72,7 +74,7 @@ void createKPathGraph(string output_filename, int k, int n, int m){
 		}
 	}
 	for (ListDigraph::ArcIt a(g); a != INVALID; ++a){
-		arc_weights[a] = rand()%1000;
+		arc_weights[a] = rand()%MAX_WEIGHT;
 	}
 
   DigraphWriter<ListDigraph>(g, output_filename)
@@ -81,3 +83,5 @@ void createKPathGraph(string output_filename, int k, int n, int m){
     .arcMap("weight", arc_weights)
     .run();
 }
+
+

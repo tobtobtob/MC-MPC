@@ -8,7 +8,7 @@ This is a generator for randomized k-path graphs. K-path graphs are guaranteed t
 
 ## Usage
 
-Generator takes four arguments, output graph file name, k, n and m. Graphs are outputted in [LEMON graph format](http://lemon.cs.elte.hu/pub/tutorial/a00018.html). Nodes have labels and arcs have labels and weights. Arc weights are randomized between 0 and `MAX_WEIGHT` (defined in code).
+Generator takes four arguments, output graph file name, k, n and m. Graphs are output in [LEMON graph format](http://lemon.cs.elte.hu/pub/tutorial/a00018.html). Nodes have labels and arcs have labels and weights. Arc weights are randomized between 0 and `MAX_WEIGHT` (defined in code).
 
 ```
 make

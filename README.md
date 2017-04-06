@@ -7,3 +7,7 @@ This is the repository for my master's thesis. It consists of several smaller pr
 `split` is a tool for splitting directed graphs' connected components into different files
 
 `mc-mpc-solver` solves minimum-cost minimum path cover in a graph by solving minimum flow
+
+`generator` is a generator tool for randomized k-path graphs
+
+`util` contains common helper functions used by other programs
