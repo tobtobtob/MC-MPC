@@ -103,7 +103,7 @@ int decompose(string filename, string output_folder)
     }
 
     if(decomposition_found == true){
-      string output_filename = output_folder + filename + "_decomp_" + to_string(decomposition_index);
+      string output_filename = output_folder + "decomp_" + to_string(decomposition_index);
       DigraphWriter<ListDigraph>(temp, output_filename)
         .nodeMap("label", temp_node_labels)
         .arcMap("label", temp_arc_labels)
