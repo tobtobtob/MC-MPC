@@ -1,4 +1,8 @@
 #include <lemon/list_graph.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <fstream>
 
 using namespace std;
 using namespace lemon;
@@ -28,4 +32,25 @@ ListDigraph::Node add_sink(ListDigraph& g){
     }
     
   return t;
+}
+
+bool directory_exists(string directory_name)
+{
+  //http://stackoverflow.com/questions/18100097/portable-way-to-check-if-directory-exists-windows-linux-c
+  struct stat info;
+  if( stat( directory_name.c_str(), &info ) != 0 )
+    return false;
+  else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows 
+    return true;
+  else
+    return false;
+}
+
+bool file_exists(string filename)
+{
+  std::ifstream infile(filename);
+  if(infile.good()){
+    return true;
+  }
+  return false;
 }
