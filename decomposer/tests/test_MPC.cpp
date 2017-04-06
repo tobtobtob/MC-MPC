@@ -1,10 +1,10 @@
-#include "../../tests/test_utils.h"
 #include <lemon/list_graph.h>
 #include <lemon/cost_scaling.h>
 #include "../MPC.h"
 #include <stdlib.h>
 #include <time.h>
-#include "../../tests/catch.hpp"
+#include "../catch.hpp"
+#include "../../util/utils.h"
 
 using namespace std;
 using namespace lemon;
@@ -65,6 +65,31 @@ TEST_CASE("Another simple test case succeeds"){
         
 }
 
+//Simple function for generating acyclic graphs
+void createRandomGraph(ListDigraph& g, int num_nodes, float edge_prob){
+
+	srand(time(NULL));
+	ListDigraph::NodeMap<int> labels(g);
+
+	for(int i=0; i<num_nodes; i++){
+		ListDigraph::Node new_node = g.addNode();
+		labels[new_node] = i;
+	}
+	for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
+		for(ListDigraph::NodeIt v(g); v != INVALID; ++v){
+
+			//no edges from bigger nodes to smaller to ensure acyclicity,
+			//and no edges from node to itself
+			//+ an attempt to create longer graphs
+			if(labels[n] >= labels[v] || labels[n] < labels[v]-20) continue;
+
+			if(rand()%100 <= edge_prob*100){
+				g.addArc(n, v);
+			}
+		}
+	}
+}
+
 void check_flow_on_nodes(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t){
   for(ListDigraph::NodeIt n(g); n != INVALID; ++n){
     if(n == s || n == t) continue;
@@ -89,8 +114,8 @@ TEST_CASE("feasible minflow is generated for a random graph"){
  
   ListDigraph::Node s, t;
   
-  s = addSource(g);
-  t = addSink(g);
+  s = add_source(g);
+  t = add_sink(g);
 
   ListDigraph::ArcMap<int> flow(g, 0);
   
@@ -108,8 +133,8 @@ TEST_CASE("feasible minflow is generated for a random graph 2"){
  
   ListDigraph::Node s, t;
   
-  s = addSource(g);
-  t = addSink(g);
+  s = add_source(g);
+  t = add_sink(g);
 
   ListDigraph::ArcMap<int> flow(g, 0);
   
@@ -126,8 +151,8 @@ TEST_CASE("feasible minflow is generated for a random graph 3"){
  
   ListDigraph::Node s, t;
   
-  s = addSource(g);
-  t = addSink(g);
+  s = add_source(g);
+  t = add_sink(g);
 
   ListDigraph::ArcMap<int> flow(g, 0);
   

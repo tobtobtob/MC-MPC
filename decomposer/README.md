@@ -14,7 +14,10 @@ make
 
 ## Running tests
 
+Tests use [catch](https://github.com/philsquared/Catch).  
+
 ```
+wget https://github.com/philsquared/Catch/releases/download/v1.8.2/catch.hpp
 make test
 ./decomposition_tests
 ```

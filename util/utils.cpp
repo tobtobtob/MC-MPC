@@ -54,3 +54,29 @@ bool file_exists(string filename)
   }
   return false;
 }
+
+
+//functions for visualizing graphs in dot format
+void drawGraphToFile(ListDigraph& g, string filename){
+	ofstream myfile;
+	myfile.open(filename);
+	myfile << "digraph g {\n";
+	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
+	{
+		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) <<  "\n";
+	}
+	myfile << "}\n";
+	myfile.close();
+}
+
+void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map, string filename){
+	ofstream myfile;
+	myfile.open(filename);
+	myfile << "digraph g {\n";
+	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
+	{
+		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
+	}
+	myfile << "}\n";
+	myfile.close();
+}
