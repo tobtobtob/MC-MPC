@@ -12,4 +12,8 @@ ListDigraph::Node add_sink(ListDigraph& g);
 bool file_exists(std::string filename);
 bool directory_exists(std::string filename);
 
+void drawGraphToFile(ListDigraph& g, string filename);
+void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map, string filename);
+
+
 #endif /* UTILS_H_ */
