@@ -12,8 +12,8 @@ string solve_minflow(string filename);
 
 int main(int argc, char* argv[])
 {
-  if (argc != 2){
-    cerr << "Usage: " << argv[0] << " GRAPH_FILENAME" << endl;
+  if (argc != 3){
+    cerr << "Usage: " << argv[0] << " GRAPH_FILENAME OUTPUT_FILENAME" << endl;
     return 1;
   }
 
@@ -23,8 +23,10 @@ int main(int argc, char* argv[])
   }
 
   string result = solve_minflow(argv[1]);
-  cout << result;
-
+  ofstream output_file;
+  output_file.open(argv[2]);
+  output_file << result;
+  output_file.close();
   return 0;
 }
 
