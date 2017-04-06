@@ -5,6 +5,7 @@
 #include <string.h>
 
 using namespace lemon;
+using namespace std;
 
 ListDigraph::Node add_source(ListDigraph& g);
 ListDigraph::Node add_sink(ListDigraph& g);

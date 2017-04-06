@@ -1,10 +1,9 @@
-#include "../../tests/test_utils.h"
 #include <lemon/list_graph.h>
 #include "../decomposition.h"
 #include "../MPC.h"
 #include <stdlib.h>
 #include <time.h>
-#include "../../tests/catch.hpp"
+#include "../catch.hpp"
 #include <lemon/bfs.h>
 
 using namespace std;
