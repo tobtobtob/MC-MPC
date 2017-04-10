@@ -65,19 +65,11 @@ string solve_minflow(string filename)
 	ListDigraph::ArcMap<int> demands(g);
 	transform_to_minflow_graph(g, demands);
 
-	//then add source and tap and connect source to all nodes with no incoming edges and all nodes with no outgoing edges to tap
+	ListDigraph::Node s = add_source(g);
+  ListDigraph::Node t = add_sink(g);
 
-	ListDigraph::Node s = g.addNode();
-	ListDigraph::Node t = g.addNode();
-
-	for (ListDigraph::NodeIt n(g); n != INVALID; ++n)
-	{
-		if (countInArcs(g, n) == 0)
-			g.addArc(s, n);
-
-		if (countOutArcs(g, n) == 0)
-			g.addArc(n, t);
-	}
+  ListDigraph::Arc freeArc = g.addArc(s, t);
+  arc_weights[freeArc] = 0;
 
 	//initalize cost scaling algorithm and give it the demands and the weights of the edges
 

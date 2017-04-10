@@ -106,26 +106,39 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 	// When the configuration of ants forms a MAC, we increase the color by one, causing the following nodes to be colored
 	// with a different color. 
 
-	int ants[num_paths];
-	for (int i = 0; i < num_paths; ++i) ants[i] = 0;
-
-	bool exit_loop = false;
 	int color = 1;
 
-	while(!exit_loop){
+	ListDigraph::NodeMap<int> node_color(g, 0);
+	int ants[num_paths];
+	for (int i = 0; i < num_paths; ++i){
+		ants[i] = 0;
+		node_color[paths[i][0]] = color;
+	}
+
+	while(true){
 
 		if(is_MAC(reachable, paths, ants, num_paths)){
 			
 			// When a MAC is found, all the upcoming nodes will belong to the next part
 			color++;
+
+			for(int i = 0; i < num_paths; ++i){
+				//update the colors of current MAC nodes to the new decomposition color
+				node_color[paths[i][ants[i]]] = color;
+			}
 			// Move every ant forwards by 1
 			for (int i = 0; i < num_paths; ++i)
 			{
 				ants[i]++;
-				//after moving an ant, color all the incoming arcs with the current color
+				//after moving an ant, color all the incoming arcs that belong to same part with current color. if there are arcs that span from other parts, mark them as discarded
 				ListDigraph::Node current = paths[i][ants[i]];
+				node_color[current] = color;
 				for(ListDigraph::InArcIt ai(g, current); ai != INVALID; ++ai){
-					decomposition[ai] = color;
+					if(node_color[g.source(ai)] == color){
+						decomposition[ai] = color;
+					} else {
+						decomposition[ai] = -1;
+					}
 				}
 			}
 		}
@@ -136,30 +149,31 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			// which is not necessarily a MAC, but we won't miss any MACs.
 			for (int i = 0; i < num_paths; ++i)
 			{
-				while(can_reach_another_node(i, reachable, paths, ants, num_paths) && paths[i][ants[i]] != t){
+				while(can_reach_another_node(i, reachable, paths, ants, num_paths) && paths[i][ants[i]] != t)
+				{
 					ants[i]++;
-					//after moving an ant, color all the incoming arcs with the current color
+					//after moving an ant, color all the incoming arcs that belong to same part with current color. if there are arcs that span from other parts, mark them as discarded
 					ListDigraph::Node current = paths[i][ants[i]];
+					node_color[current] = color;
 					for(ListDigraph::InArcIt ai(g, current); ai != INVALID; ++ai){
-						decomposition[ai] = color;
+						if(node_color[g.source(ai)] == color){
+							decomposition[ai] = color;
+						} else {
+							decomposition[ai] = -1;
+						}
 					}
 				}
 			}
 		}
 
-		// If any of the ants is in the sink node, we cant find any more MACs and the loop can terminate.
+		// terminate only when all ants are in the sink node
+		bool terminate = true;
 		for (int i = 0; i < num_paths; ++i)
 		{
-			if(paths[i][ants[i]] == t){
-				exit_loop = true;
+			if(paths[i][ants[i]] != t){
+				terminate = false;
 			}
 		}
-	}
-
-	//color all the remaining arcs with the last color
-	for(ListDigraph::ArcIt a(g); a != INVALID; ++a){
-		if(decomposition[a] == 0){
-			decomposition[a] = color;
-		}
+		if(terminate) break;
 	}
 }
