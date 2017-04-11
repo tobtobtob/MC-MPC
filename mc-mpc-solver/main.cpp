@@ -89,7 +89,7 @@ string solve_minflow(string filename)
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
     //we have added many extra arcs which are not needed in the output
     if(original_arc[ai]){
-      result += (to_string(arc_labels[ai]) + " " + to_string(minflow[ai]) + "\n");
+      result += (to_string(arc_labels[ai]) + " " + to_string(minflow[ai]) + " " + to_string(arc_weights[ai]) + "\n");
     }
   }
 
