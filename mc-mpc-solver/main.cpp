@@ -3,6 +3,8 @@
 #include <string.h>
 #include <lemon/lgf_reader.h>
 #include <lemon/lgf_writer.h>
+#include <lemon/connectivity.h>
+#include <lemon/circulation.h>
 #include "../util/utils.h"
 
 using namespace lemon;
@@ -56,8 +58,10 @@ string solve_minflow(string filename)
     .run();
   
   ListDigraph::ArcMap<bool> original_arc(g, false);
+  int arc_weight_sum = 0;
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
     original_arc[ai] = true;
+    arc_weight_sum += arc_weights[ai];
   }
 
 	// transform the graph so that every node is split in two, and demand for the edge between the duplicates is 1
@@ -68,17 +72,14 @@ string solve_minflow(string filename)
 	ListDigraph::Node s = add_source(g);
   ListDigraph::Node t = add_sink(g);
 
-  ListDigraph::Arc freeArc = g.addArc(s, t);
-  arc_weights[freeArc] = 0;
-
-	//initalize cost scaling algorithm and give it the demands and the weights of the edges
+  ListDigraph::Arc sink_to_source = g.addArc(t, s);
+  arc_weights[sink_to_source] = arc_weight_sum;
+  
+	//initialize cost scaling algorithm and give it the demands and the weights of the edges
 
 	CostScaling<ListDigraph> costScaling(g);
 	costScaling.lowerMap(demands);
 	costScaling.costMap(arc_weights);
-
-	//pushing 100 units of flow is just arbitrary number, it has to be equal or bigger than the minimum flow
-	costScaling.stSupply(s, t, 100);
 
 	costScaling.run();
 
@@ -89,7 +90,7 @@ string solve_minflow(string filename)
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
     //we have added many extra arcs which are not needed in the output
     if(original_arc[ai]){
-      result += (to_string(arc_labels[ai]) + " " + to_string(minflow[ai]) + "\n");
+      result += (to_string(arc_labels[ai]) + " " + to_string(minflow[ai]) + " " + to_string(arc_weights[ai]) + "\n");
     }
   }
 

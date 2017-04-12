@@ -130,11 +130,11 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 			for (int i = 0; i < num_paths; ++i)
 			{
 				ants[i]++;
-				//after moving an ant, color all the incoming arcs that belong to same part with current color. if there are arcs that span from other parts, mark them as discarded
+				//after moving an ant, color all the incoming arcs that belong to same part with current color. if there are arcs that span from earlier parts, mark them as discarded
 				ListDigraph::Node current = paths[i][ants[i]];
 				node_color[current] = color;
 				for(ListDigraph::InArcIt ai(g, current); ai != INVALID; ++ai){
-					if(node_color[g.source(ai)] == color){
+					if(node_color[g.source(ai)] == color || node_color[g.source(ai)] == 0){
 						decomposition[ai] = color;
 					} else {
 						decomposition[ai] = -1;
@@ -156,7 +156,7 @@ void decompose_graph(ListDigraph& g, ListDigraph::ArcMap<int>& minFlow, ListDigr
 					ListDigraph::Node current = paths[i][ants[i]];
 					node_color[current] = color;
 					for(ListDigraph::InArcIt ai(g, current); ai != INVALID; ++ai){
-						if(node_color[g.source(ai)] == color){
+						if(node_color[g.source(ai)] == color || node_color[g.source(ai)] == 0){
 							decomposition[ai] = color;
 						} else {
 							decomposition[ai] = -1;
