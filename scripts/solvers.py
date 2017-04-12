@@ -26,34 +26,34 @@ def solve_with_decomposition(input_file):
   os.system("{0}decompose {1} {2}".format(BIN_FOLDER, input_file, OUTPUT_FOLDER+"decomposition/"))
 
   solution_index = 0
-  for(decomp in glob.glob(OUTPUT_FOLDER+"decomposition/*")):
+  for decomp in glob.glob(OUTPUT_FOLDER+"decomposition/*"):
     os.system("{0}mc-mpc {1} {2}".format(BIN_FOLDER, decomp, OUTPUT_FOLDER+"results/"+str(solution_index)))
     solution_index += 1
   
-  sum = 0
-  for(result_file in glob.glob(OUTPUT_FOLDER+"results/*")):
+  arc_sum = 0
+  for result_file in glob.glob(OUTPUT_FOLDER+"results/*"):
     f = open(result_file, 'r')
     for line in f:
       line = line.split()
       amount = int(line[1])
       weight = int(line[2])
-      sum += amount*weight
+      arc_sum += amount*weight
     f.close()
   
-  return sum
+  return arc_sum
 
 def solve_without_decomposition(input_file):
 
-  create_clean_folders()
-  os.system("{0}mc-mpc {1} {2}".format(BIN_FOLDER, decomp, OUTPUT_FOLDER+"results/"+"result")
+  os.system("mkdir -p {0}results".format(OUTPUT_FOLDER))
+  os.system("{0}mc-mpc {1} {2}".format(BIN_FOLDER, input_file, OUTPUT_FOLDER+"results/"+"result"))
 
-  sum = 0
+  arc_sum = 0
   f = open(OUTPUT_FOLDER+"/results/result", 'r')
   for line in f:
     line = line.split()
     amount = int(line[1])
     weight = int(line[2])
-    sum += amount*weight
+    arc_sum += amount*weight
   f.close()
 
-  return sum
+  return arc_sum
