@@ -101,7 +101,6 @@ int decompose(string filename, string output_folder)
         temp_arc_weights[temp_arc] = arc_weights[a];
       }
     }
-
     if(decomposition_found == true){
       string output_filename = output_folder + "decomp_" + to_string(decomposition_index);
       DigraphWriter<ListDigraph>(temp, output_filename)

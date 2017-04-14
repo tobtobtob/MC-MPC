@@ -8,7 +8,8 @@ def test_sum(k, n, m):
 
   decomposed_sum = solvers.solve_with_decomposition(TEST_GRAPH_NAME)
   normal_sum = solvers.solve_without_decomposition(TEST_GRAPH_NAME)
-
+  print decomposed_sum
+  print normal_sum
   if( decomposed_sum != normal_sum):
     print "Test failed"
     return 0
@@ -18,4 +19,4 @@ def test_sum(k, n, m):
 
 
 #for i in range(1, 10):
-test_sum(5, 100, 10000)
+test_sum(2, 3, 10)
