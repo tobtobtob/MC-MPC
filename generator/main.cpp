@@ -55,19 +55,22 @@ void createKPathGraph(string output_filename, int k, int n, int m)
 
   Dfs<ListDigraph> dfs(g);
 
+  int num_added = 0;
+
 	for (int i = 0; i < m; ++i){
 		int k1 = rand()%k;
 		int k2 = rand()%k;
 		int n1 = rand()%n;
-		int n2 = rand()%n;
+		int n2 = (rand()%(n-n1))+n1;
 
     ListDigraph::Node from_node = nodes[k1][n1];
     ListDigraph::Node to_node = nodes[k2][n2];
-
 		if(findArc(g, from_node, to_node) == INVALID && !dfs.run(to_node, from_node)){
 			ListDigraph::Arc temp_arc = g.addArc(nodes[k1][n1], nodes[k2][n2]);
+      num_added++;
 		}
 	}
+  cout << "arcs added: " << to_string(num_added) << endl;
 
   //Shuffle nodes
 
