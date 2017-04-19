@@ -3,6 +3,7 @@
 #include <lemon/connectivity.h>
 #include <stack>
 #include <stdlib.h>
+#include "../util/utils.h"
 
 
 using namespace lemon;
@@ -107,14 +108,12 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
     visited[currentNode] = true;
 
     if(currentNode == t){
+      
       while(!path.empty()){
         if(path.top().second){
-          
-          flow_on_node[g.source(path.top().first)]--;
-          flow[path.top().first]--;
+         flow[path.top().first]--;
         }else{
           flow[path.top().first]++;
-          flow_on_node[g.source(path.top().first)]++;
         }
         path.pop();
       }
@@ -125,11 +124,12 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
     }
 
     //we can use forward arcs only if there is extra flow on that node
-    if(flow_on_node[currentNode] > 1 || !path.top().second){
+    if(flow_on_node[currentNode] > 0 || !path.top().second){
 
       for(ListDigraph::OutArcIt o(g, currentNode); o != INVALID; ++o){
         if(flow[o] > 0 && !visitedArc[o].first && o != currentArc){
           path.push(make_pair(o, true));
+          flow_on_node[g.target(o)]--;
           goto loop;
         }
       }
@@ -138,6 +138,7 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
     for(ListDigraph::InArcIt i(g, currentNode); i != INVALID; ++i){
       if(!visitedArc[i].second && i != currentArc){
         path.push(make_pair(i, false));
+        flow_on_node[g.source(i)]++;
         goto loop;
       }
     }
@@ -153,6 +154,9 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
 void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t)
 {
   find_feasible_flow(g, flow, s, t);
-  while(find_augmenting_path(g, flow, s, t)){   
+  drawGraphToFileWithArcMap(g, flow, "feasible.dot");
+  while(find_augmenting_path(g, flow, s, t)){
   }
+  drawGraphToFileWithArcMap(g, flow, "minflow.dot");
 }
+
