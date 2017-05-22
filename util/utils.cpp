@@ -68,7 +68,7 @@ void drawGraphToFile(ListDigraph& g, string filename){
 	myfile << "}\n";
 	myfile.close();
 }
-
+/**
 void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map, string filename){
 	ofstream myfile;
 	myfile.open(filename);
@@ -76,6 +76,23 @@ void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map, st
 	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
 	{
 		myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
+	}
+	myfile << "}\n";
+	myfile.close();
+}**/
+
+void drawGraphToFileWithArcMap(ListDigraph& g, ListDigraph::ArcMap<int>& map, string filename){
+	ofstream myfile;
+	myfile.open(filename);
+	myfile << "digraph g {\n";
+	for (ListDigraph::ArcIt a(g); a!= INVALID; ++a)
+	{
+
+    if(map[a] == 1){
+      myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\", color=blue] \n";
+    } else {
+		  myfile << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [label=\"" << map[a] << "\"] \n";
+    }
 	}
 	myfile << "}\n";
 	myfile.close();
