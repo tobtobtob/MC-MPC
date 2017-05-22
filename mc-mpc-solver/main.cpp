@@ -1,5 +1,7 @@
 #include <lemon/list_graph.h>
+#include <lemon/concepts/digraph.h>
 #include <lemon/cost_scaling.h>
+#include <lemon/network_simplex.h>
 #include <string.h>
 #include <lemon/lgf_reader.h>
 #include <lemon/lgf_writer.h>
@@ -8,12 +10,15 @@
 #include "../util/utils.h"
 #include "../decomposer/decomposition.h"
 #include "../decomposer/MPC.h"
+#include <time.h>
 
 using namespace lemon;
+using namespace lemon::concepts;
 using namespace std;
 
 string solve_minflow(string filename);
 string solve_with_decomposition(string filename);
+string solve_with_decomposition2(string filename);
 
 int main(int argc, char* argv[])
 {
@@ -72,12 +77,19 @@ string solve_with_decomposition(string filename)
   
   ListDigraph::Node s = add_source(graph);
   ListDigraph::Node t = add_sink(graph);
-
+  clock_t start = clock();
+  cout << "start ";
   ListDigraph::ArcMap<int> minflow(graph);
   find_minflow(graph, minflow, s, t);
+  clock_t after_minflow = clock();
+  cout << "minflow ";
 
   ListDigraph::ArcMap<int> decomposition(graph);
   decompose_graph(graph, minflow, s, t, decomposition);
+  clock_t after_decomp = clock();
+  cout << "decomp " << endl;
+  cout << "minflow: " << to_string(((float) (after_minflow-start)/CLOCKS_PER_SEC)) << " decomp: " << to_string(((float) (after_decomp-after_minflow)/CLOCKS_PER_SEC)) << endl;
+
 
   //sink and source nodes added to the graph should not be included in the output
   graph.erase(s);
@@ -89,7 +101,12 @@ string solve_with_decomposition(string filename)
     if(num_decompositions < decomposition[ai]) {
       num_decompositions = decomposition[ai];
     }
-  } 
+  }
+
+  cout << "num decompositions: " << to_string(num_decompositions) << endl;
+  
+  clock_t copy_time = 0;
+  clock_t solve_time = 0;
 
   //this index is just for output file names. there is not necessarily a decomposition for every normal index number
   int decomposition_index = 0;
@@ -98,6 +115,7 @@ string solve_with_decomposition(string filename)
 
   for(int i = 0; i <= num_decompositions; i++)
   {
+    clock_t start2 = clock();
     ListDigraph temp;
     ListDigraph::NodeMap<int> temp_node_labels(temp);
     ListDigraph::ArcMap<int> temp_arc_labels(temp);
@@ -130,6 +148,8 @@ string solve_with_decomposition(string filename)
         temp_arc_weights[temp_arc] = arc_weights[a];
       }
     }
+    copy_time += (clock()-start2);
+    clock_t start3 = clock();
     //solve in decomposed parts
     if(decomposition_found){
       ListDigraph::ArcMap<bool> original_arc(temp, false);
@@ -148,7 +168,7 @@ string solve_with_decomposition(string filename)
       temp_arc_weights[sink_to_source] = arc_weight_sum;
   
 	    //initialize cost scaling algorithm and give it the demands and the weights of the edges
-
+      /**
 	    CostScaling<ListDigraph> costScaling(temp);
 	    costScaling.lowerMap(demands);
 	    costScaling.costMap(temp_arc_weights);
@@ -157,7 +177,15 @@ string solve_with_decomposition(string filename)
 
       ListDigraph::ArcMap<int> minflow(temp);
       costScaling.flowMap(minflow);
+      **/
 
+      NetworkSimplex<ListDigraph> solver(temp);
+      solver.lowerMap(demands);
+      solver.costMap(arc_weights);
+      solver.run();
+      ListDigraph::ArcMap<int> minflow(temp);
+      solver.flowMap(minflow);
+      
       for(ListDigraph::ArcIt ai(temp); ai != INVALID; ++ai){
       //we have added many extra arcs which are not needed in the output
         if(original_arc[ai]){
@@ -165,13 +193,17 @@ string solve_with_decomposition(string filename)
         }
       }
     }
+    solve_time += (clock()-start3);
   }
+  cout << "copy: " << to_string(((float) copy_time)/CLOCKS_PER_SEC) << " solve: " << to_string(((float) solve_time)/CLOCKS_PER_SEC) << endl;
   return result; 
 
 }
 
 string solve_minflow(string filename)
 {
+
+  clock_t start = clock();
 
   ListDigraph g;
   ListDigraph::NodeMap<int> node_labels(g);
@@ -190,6 +222,7 @@ string solve_minflow(string filename)
     arc_weight_sum += arc_weights[ai];
   }
 
+  clock_t start2 = clock();
 	// transform the graph so that every node is split in two, and demand for the edge between the duplicates is 1
 
 	ListDigraph::ArcMap<int> demands(g);
@@ -202,7 +235,7 @@ string solve_minflow(string filename)
   arc_weights[sink_to_source] = arc_weight_sum;
   
 	//initialize cost scaling algorithm and give it the demands and the weights of the edges
-
+  /**
 	CostScaling<ListDigraph> costScaling(g);
 	costScaling.lowerMap(demands);
 	costScaling.costMap(arc_weights);
@@ -211,7 +244,15 @@ string solve_minflow(string filename)
 
   ListDigraph::ArcMap<int> minflow(g);
   costScaling.flowMap(minflow);
-
+  **/
+  
+  NetworkSimplex<ListDigraph> solver(g);
+  solver.lowerMap(demands);
+  solver.costMap(arc_weights);
+  solver.run();
+  ListDigraph::ArcMap<int> minflow(g);
+  solver.flowMap(minflow);
+ 
   string result = "";
   for(ListDigraph::ArcIt ai(g); ai != INVALID; ++ai){
     //we have added many extra arcs which are not needed in the output
@@ -219,6 +260,8 @@ string solve_minflow(string filename)
       result += (to_string(arc_labels[ai]) + " " + to_string(minflow[ai]) + " " + to_string(arc_weights[ai]) + "\n");
     }
   }
+  clock_t start3 = clock();
+  cout << "normal: reading: " << to_string(((float) start2-start) / CLOCKS_PER_SEC) << " solving: " << to_string(((float) start3-start2) / CLOCKS_PER_SEC) << endl;
 
   return result;
 }

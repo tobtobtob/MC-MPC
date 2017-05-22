@@ -154,9 +154,12 @@ bool find_augmenting_path(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDi
 void find_minflow(ListDigraph& g, ListDigraph::ArcMap<int>& flow, ListDigraph::Node s, ListDigraph::Node t)
 {
   find_feasible_flow(g, flow, s, t);
-  drawGraphToFileWithArcMap(g, flow, "feasible.dot");
+  //drawGraphToFileWithArcMap(g, flow, "feasible.dot");
+  int index = 0;
   while(find_augmenting_path(g, flow, s, t)){
+    index++;
   }
-  drawGraphToFileWithArcMap(g, flow, "minflow.dot");
+  //cout << "INDEX: " << to_string(index) << endl;
+  //drawGraphToFileWithArcMap(g, flow, "minflow.dot");
 }
 

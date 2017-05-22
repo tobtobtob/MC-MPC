@@ -2,18 +2,19 @@ import matplotlib.pyplot as plt
 import math
 import time
 import solvers
+import timeit
 
 TEST_GRAPH_NAME = "test_graph"
 
 def plot(k_values, n_values , m_values, title, filename):
   plt.clf()
-  k = map(lambda x: x /10, values)
   m = 0.5
   results_decomp = [0]*len(values)
   results_normal = [0]*len(values)
   index = 0
   for n in n_values:
-    solvers.generate_k_path_graph(k[index], n, m_values[index], TEST_GRAPH_NAME)
+    solvers.generate_k_path_graph_alt(k_values[index], n, m_values[index], TEST_GRAPH_NAME)
+    #solvers.generate_dag(n, 0.9, TEST_GRAPH_NAME)
     print "GRAPH OF SIZE: " +str(n)
     start = time.time()
     decomposed_sum = solvers.solve_with_decomposition(TEST_GRAPH_NAME)
@@ -36,8 +37,9 @@ def plot(k_values, n_values , m_values, title, filename):
   plt.savefig(filename)
 
 
-values = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 1000]
 
+values = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]
+#values = [10, 100, 500, 1000, 1500, 2000]
 def k_10():
   k_values = len(values)*[10]
   plot(k_values, values, values, "k = 10, m = n", "k10.png")
@@ -51,5 +53,5 @@ def k_sqrt():
   plot(k_values, values, values, "k = sqrt(n), m = n", "ksqrtn.png")
 
 k_10()
-k_logn()
+#k_logn()
 k_sqrt()

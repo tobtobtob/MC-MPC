@@ -8,6 +8,12 @@ OUTPUT_FOLDER = os.getenv("OUTPUT_FOLDER", "output/")
 def generate_k_path_graph(k, n, m, output_file):
   os.system(BIN_FOLDER + "generator {0} {1} {2} {3}".format(output_file, k, n, m))
 
+def generate_k_path_graph_alt(k, n, m, output_file):
+  os.system(BIN_FOLDER + "generator {0} {1} {2} {3} --alt".format(output_file, k, n, m))
+
+def generate_dag(n, prob, output_file):
+  os.system(BIN_FOLDER + "generator {0} {1} {2}".format(output_file, n, prob))
+
 def decompose(input_file, output_folder):
   os.system(BIN_FOLDER + "decompose {0} {1}".format(input_file, output_folder))
 
@@ -23,10 +29,7 @@ def create_clean_folders():
 def solve_with_decomposition(input_file):
 
   os.system("mkdir -p {0}results".format(OUTPUT_FOLDER))
-  time1 = time.time()
-
   os.system("{0}mc-mpc {1} {2} --decomp".format(BIN_FOLDER, input_file, OUTPUT_FOLDER+"results/"+"result"))
-  time2 = time.time()
 
   arc_sum = 0
   f = open(OUTPUT_FOLDER+"results/result", 'r')
@@ -36,9 +39,6 @@ def solve_with_decomposition(input_file):
     weight = int(line[2])
     arc_sum += amount*weight
   f.close()
-  time3 = time.time()
-  print "Decomposition took " + str(time2-time1)
-  print "solving took " + str(time3-time2)
   
   return arc_sum #arc_sum
 
